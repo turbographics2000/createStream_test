@@ -60,6 +60,12 @@ function createStream({
     audio = false, 
     video = true
 } = {}) {
+    if(preview.srcObject) {
+        var stream = preview.srcObject;
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+        preview.srcObject = null;
+    }
     if(renderStreamId) cancelAnimationFrame(renderStreamId); // テスト用のコード 
     var proc = null;
     if(url) {
