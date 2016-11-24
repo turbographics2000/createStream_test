@@ -177,7 +177,7 @@ function createStream({
             ctx.fillStyle = 'white';
             ctx.textAlign = 'right';
             let ratio = Math.min(cnv.width / mediaWidth, cnv.height / mediaHeight);
-            let tracks = [cnv.captureStream().getVideoTrack()[0]];
+            let tracks = [cnv.captureStream().getVideoTracks()[0]];
             if(audioTrack) tracks.push(audioTrack);
             let stream = new MediaStream([tracks]);
             streams[myId][stream.id] = {
