@@ -21,7 +21,11 @@ var browserType = window.chrome ? 'Chrome' :
     var btn = document.createElement('button');
     btn.textContent = [].concat(val).join('-').toString();
     btn.onclick = function() {
-        createStream({captureType: this.textContent.split('-')});
+        try{
+            createStream({captureType: this.textContent.split('-')});
+        } catch(ex) {
+            console.log(ex);
+        }
     }
     btnContainer.appendChild(btn);
 });
