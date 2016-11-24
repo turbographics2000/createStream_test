@@ -32,7 +32,9 @@ function chromeExtSend(msg) {
     ['tab', 'window'],
     ['screen', 'tab', 'window'],
     ['screen', 'hoge'],
-    ['tab', 'hoge', 'window']
+    ['tab', 'hoge', 'window'],
+    'camera',
+    'dummy'
 ].forEach(val => {
     var btn = document.createElement('button');
     btn.textContent = [].concat(val).join('-').toString();
@@ -101,9 +103,10 @@ function createStream({
                         });
                     }
                 } else if(browserType === 'Firefox') {
-                    captureType = captureType[0]; // TODO
-                    if(['application', 'screen', 'window'].includes(captureType)) {
-                        prevProc = Promise.resolve({mediaSource: captureType});
+                    if(typeof captureType === 'string') {
+                        if(['application', 'screen', 'window'].includes(captureType)) {
+                            prevProc = Promise.resolve({mediaSource: captureType});
+                        }
                     }
                 }
             }
