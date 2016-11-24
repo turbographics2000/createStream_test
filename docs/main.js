@@ -1,3 +1,4 @@
+var extensionId = 'ophefhhmblpnpplgcaeihbobllolhpnl';
 var browserType = window.chrome ? 'Chrome' :
               window.StyleMedia ? 'Edge' :
               window.InstallTrigger ? 'Firefox' :
