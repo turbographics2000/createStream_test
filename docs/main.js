@@ -40,7 +40,7 @@ function chromeExtSend(msg) {
     btn.textContent = [].concat(val).join('-').toString();
     btn.onclick = function() {
         try{
-            createStream({captureType: this.textContent}).catch(err => {
+            createStream({captureType: this.textContent === 'dummy' ? null : this.textContent}).catch(err => {
                 console.log(err);
             });
         } catch(ex) {
