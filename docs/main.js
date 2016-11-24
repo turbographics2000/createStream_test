@@ -22,7 +22,9 @@ var browserType = window.chrome ? 'Chrome' :
     btn.textContent = [].concat(val).join('-').toString();
     btn.onclick = function() {
         try{
-            createStream({captureType: this.textContent.split('-')});
+            createStream({captureType: this.textContent.split('-')}).catch(err => {
+                console.log(err);
+            });
         } catch(ex) {
             console.log(ex);
         }
@@ -43,16 +45,15 @@ function createStream({
     var proc = null;
     if(url) {
         if(typeof options.url !== 'string') {
-            throw 'createStream TypeError: options.fileURL is not a string.';
+            proc.reject('createStream TypeError: options.fileURL is not a string.');
         } 
         proc = fetch(options.url).then(response => response.blob()).then(file => {file});
     } else if(file) {
         if(options.file.constructor || options.file.constructor.name !== 'File') {
-            throw 'createStream TypeError: options.file is not a File.';
+            proc.reject('createStream TypeError: options.file is not a File.');
         }
         proc = Promise.resolve({file});
     } else if(captureType) {
-        var videoConstraints = null;
         var captureMethod = 'getUserMedia';
         var prevProc = null;
         if(captureType === 'camera') {
@@ -91,21 +92,21 @@ function createStream({
             }
         }
         if(!prevProc) {
-            throw {name: 'createStream', message: 'captureType error: "' + captureType + '" is not support.'};
+            proc = Promise.reject({
+                name: 'createStream', 
+                message: 'captureType error: "' + captureType + '" is not support.'
+            });
         } else {
             proc = prevProc.then(constraints => {
-                if(constraints) {
-                    constraints.audio = audo;
-                    navigator.mediaDevices[captureMethod]({video: videoConstraints, audio});
-                } else {
-                }
+                constraints.audio = audo;
+                navigator.mediaDevices[captureMethod]({video: videoConstraints, audio});
             });
         }
     } else {
         proc = Promise.resolve();
     }
 
-    proc.then(({stream = null, file = null} = {}) => {
+    return proc.then(({stream = null, file = null} = {}) => {
         if(stream) return {stream};
         return new Promise((resolve, reject) => {
             if(file) {
@@ -185,10 +186,10 @@ function createStream({
             }
             preview.srcObject = stream;
         } else {
-            streams[myId][stream.id] = {stream}; 
+            preview.srcObject = stream;
+            //streams[myId][stream.id] = {stream}; 
         }
-    })
-    .catch(error => log('UI', 'error', error.message));
+    });
 }
 
 function renderDummyVideoTrack() {
