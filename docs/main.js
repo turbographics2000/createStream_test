@@ -108,7 +108,7 @@ function createStream({
             });
         } else {
             proc = prevProc.then(constraints => {
-                constraints.audio = audo;
+                constraints.audio = audio;
                 navigator.mediaDevices[captureMethod]({video: videoConstraints, audio}).then(stream => {stream});
             });
         }
