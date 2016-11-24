@@ -156,7 +156,7 @@ function createStream({
                         audioTrack
                     });
                 };
-                media.src = `./${myId}/${no}.jpg`;
+                media.src = `./${myId}/${0}.jpg`;
             }
         });
     }).then(({stream, media, mediaURL, renderCanvas, audioTrack}) => {
