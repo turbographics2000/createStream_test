@@ -107,8 +107,7 @@ function createStream({
                 message: 'captureType error: "' + captureType + '" is not support.'
             });
         } else {
-            proc = prevProc.then(constraints => {
-                constraints.audio = audio;
+            proc = prevProc.then(videoConstraints => {
                 navigator.mediaDevices[captureMethod]({video: videoConstraints, audio}).then(stream => {stream});
             });
         }
