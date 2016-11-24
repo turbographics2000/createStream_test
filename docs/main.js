@@ -1,3 +1,9 @@
+var browserType = window.chrome ? 'Chrome' :
+              window.StyleMedia ? 'Edge' :
+              window.InstallTrigger ? 'Firefox' :
+              window.safari ? 'Safari' :
+              'Unsupported Browser';
+
 [
     'application',
     'browser',
@@ -19,6 +25,7 @@
     }
     btnContainer.appendChild(btn);
 });
+
 
 function createStream({
     url = null, 
