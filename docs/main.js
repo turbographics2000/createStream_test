@@ -50,10 +50,10 @@ function createStream({
     } else if(captureType) {
         var videoConstraints = null;
         var captureMethod = 'getUserMedia';
+        var prevProc = null;
         if(captureType === 'camera') {
-            videoConstraints = video ? {width, height} : false;
+            prevProc = Promise.resolve(video ? {width, height} : true); 
         } else {
-            var prevProc = null;
             if(navigator.mediaDevices.getDisplayMedia) {
                 if(['application', 'browser', 'monitor', 'window'].includes(captureType)) {
                     prevProc = Promise.resolve({displaySurface: captureType});
