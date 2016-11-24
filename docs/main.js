@@ -86,14 +86,17 @@ function createStream({
                 }
             }
         }
-        proc = prevProc.then(constraints => {
-            if(constraints) {
-                constraints.audio = audo;
-                navigator.mediaDevices[captureMethod]({video: videoConstraints, audio});
-            } else {
-                throw {name: 'createStream', message: 'captureType error: "' + captureType + '" is not support.'};
-            }
-        });
+        if(!prevProc) {
+            throw {name: 'createStream', message: 'captureType error: "' + captureType + '" is not support.'};
+        } else {
+            proc = prevProc.then(constraints => {
+                if(constraints) {
+                    constraints.audio = audo;
+                    navigator.mediaDevices[captureMethod]({video: videoConstraints, audio});
+                } else {
+                }
+            });
+        }
     } else {
         proc = Promise.resolve();
     }
