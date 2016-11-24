@@ -7,6 +7,8 @@ var browserType = window.chrome ? 'Chrome' :
 var myId = 'cat';
 let audioContext = new AudioContext();
 var renderStreamId = null;
+var streams = {};
+streams[myId] = {};
 window.MediaStream = window.MediaStream || window.webkitMediaStream;
 
 function chromeExtSend(msg) {
@@ -182,26 +184,25 @@ function createStream({
             let tracks = [cnv.captureStream().getVideoTracks()[0]];
             if(audioTrack) tracks.push(audioTrack);
             let stream = new MediaStream(tracks);
-            // streams[myId][stream.id] = {
-            //     cnv,
-            //     ctx,
-            //     media,
-            //     mediaURL,
-            //     left: (cnv.width - (video.videoWidth * ratio)) / 2,
-            //     top: (cnv.height - (video.videoHeight * ratio)) / 2,
-            //     width: (media.videoWidth || media.naturalWidth) * ratio,
-            //     height: (media.videoHeight || media.naturalHeight) * ratio,
-            //     time: type === 'dummy',
-            //     stream
-            // };
+            streams[myId][stream.id] = {
+                cnv,
+                ctx,
+                media,
+                mediaURL,
+                left: (cnv.width - (video.videoWidth * ratio)) / 2,
+                top: (cnv.height - (video.videoHeight * ratio)) / 2,
+                width: (media.videoWidth || media.naturalWidth) * ratio,
+                height: (media.videoHeight || media.naturalHeight) * ratio,
+                time: type === 'dummy',
+                stream
+            };
             if(!renderStreamId) {
                 renderStreamId = requestAnimationFrame(renderDummyVideoTrack);
             }
-            preview.srcObject = stream;
         } else {
-            preview.srcObject = stream;
-            //streams[myId][stream.id] = {stream}; 
+            streams[myId][stream.id] = {stream}; 
         }
+        preview.srcObject = stream;
     });
 }
 
