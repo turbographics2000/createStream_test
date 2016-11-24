@@ -72,6 +72,7 @@ function createStream({
         cancelAnimationFrame(renderStreamId);
         renderStreamId = null;
     }
+    streams[myId] = {};
     // -------------------------------------------------
 
 
