@@ -6,6 +6,7 @@ var browserType = window.chrome ? 'Chrome' :
               'Unsupported Browser';
 var myId = 'cat';
 let audioContext = new AudioContext();
+window.MediaStream = window.MediaStream || window.webkitMediaStream;
 
 function chromeExtSend(msg) {
     return new Promise((resolve, reject) => {
