@@ -101,7 +101,7 @@ function createStream({
                         });
                     }
                 } else if(browserType === 'Firefox') {
-                    if(['application', 'screen', 'window'].includes(captureType)) {
+                    if(captureType.every(val => ['application', 'screen', 'window'].includes(val))) {
                         prevProc = Promise.resolve({mediaSource: captureType});
                     }
                 }
