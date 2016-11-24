@@ -11,7 +11,7 @@
     ['screen', 'tab', 'window'],
     ['screen', 'hoge'],
     ['tab', 'hoge', 'window']
-].foreach(val => {
+].forEach(val => {
     var btn = document.createElement('button');
     btn.textContent = val.join('-').toString();
     btn.onclick = function() {
