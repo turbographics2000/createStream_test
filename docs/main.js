@@ -5,7 +5,7 @@ var browserType = window.chrome ? 'Chrome' :
               window.safari ? 'Safari' :
               'Unsupported Browser';
 
-function chromExtSend(msg) {
+function chromeExtSend(msg) {
     return new Promise((resolve, reject) => {
         chrome.runtime.sendMessage(extensionId, msg, res =>{
             resolve(res);
