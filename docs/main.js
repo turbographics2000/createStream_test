@@ -60,7 +60,6 @@ function createStream({
     audio = false, 
     video = true
 } = {}) {
-    if(captureType.includes('-')) captureType = captureType.split('-');
     var proc = null;
     if(url) {
         if(typeof options.url !== 'string') {
@@ -73,6 +72,7 @@ function createStream({
         }
         proc = Promise.resolve({file});
     } else if(captureType) {
+        if(captureType.includes('-')) captureType = captureType.split('-');
         var captureMethod = 'getUserMedia';
         var prevProc = null;
         if(captureType === 'camera') {
