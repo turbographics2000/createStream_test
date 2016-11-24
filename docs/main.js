@@ -76,7 +76,9 @@ function createStream({
         var captureMethod = 'getUserMedia';
         var prevProc = null;
         if(captureType === 'camera') {
-            prevProc = Promise.resolve(video ? {width, height} : true); 
+            prevProc = Promise.resolve(video ? {width, height} : true);
+        } else if(captureType === 'dummy') {
+
         } else {
             if(navigator.mediaDevices.getDisplayMedia) {
                 if(['application', 'browser', 'monitor', 'window'].includes(captureType)) {
@@ -195,10 +197,10 @@ function createStream({
                 ctx,
                 media,
                 mediaURL,
-                left: (cnv.width - (video.videoWidth * ratio)) / 2,
-                top: (cnv.height - (video.videoHeight * ratio)) / 2,
-                width: (media.videoWidth || media.naturalWidth) * ratio,
-                height: (media.videoHeight || media.naturalHeight) * ratio,
+                left: (cnv.width - (mediaWidth * ratio)) / 2,
+                top: (cnv.height - (mediaHeight * ratio)) / 2,
+                width: mediaWidth * ratio,
+                height: mediaHeight * ratio,
                 time: media.constructor.name === 'HTMLImageElement',
                 stream
             };
