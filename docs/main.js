@@ -5,6 +5,7 @@ var browserType = window.chrome ? 'Chrome' :
               window.safari ? 'Safari' :
               'Unsupported Browser';
 var myId = 'cat';
+let audioContext = new AudioContext();
 
 function chromeExtSend(msg) {
     return new Promise((resolve, reject) => {
