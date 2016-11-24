@@ -53,7 +53,7 @@ function createStream({
                 }
                 captureMethod = 'getDisplayMedia';
             } 
-            if(!constraints) {
+            if(!videoConstraints) {
                 if(browserType === 'Chrome') {
                     captureType = [].concat(captureType);
                     if(captureType.every(val => ['screen', 'window', 'tab'].includes(val))) {
