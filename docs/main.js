@@ -18,7 +18,7 @@
         createStream({captureType: this.textContent.split('-')});
     }
     btnContainer.appendChild(btn);
-})
+});
 
 function createStream({
     url = null, 
