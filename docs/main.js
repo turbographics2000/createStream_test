@@ -13,7 +13,7 @@
     ['tab', 'hoge', 'window']
 ].forEach(val => {
     var btn = document.createElement('button');
-    btn.textContent = val.join('-').toString();
+    btn.textContent = [].concat(val).join('-').toString();
     btn.onclick = function() {
         createStream({captureType: this.textContent.split('-')});
     }
