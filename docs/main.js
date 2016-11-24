@@ -114,7 +114,8 @@ function createStream({
             });
         } else {
             proc = prevProc.then(videoConstraints => {
-                return navigator.mediaDevices[captureMethod]({video: videoConstraints, audio}).then(stream => {{stream}});
+                return navigator.mediaDevices[captureMethod]({video: videoConstraints, audio})
+                        .then(stream => {return {stream}});
             });
         }
     } else {
