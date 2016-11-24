@@ -29,8 +29,6 @@ function createStream({
     audio = false, 
     video = true
 } = {}) {
-    options = options || {};
-    var type = 'dummy';
     var proc = null;
     if(url) {
         if(typeof options.url !== 'string') {
