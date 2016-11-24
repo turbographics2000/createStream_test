@@ -4,6 +4,7 @@ var browserType = window.chrome ? 'Chrome' :
               window.InstallTrigger ? 'Firefox' :
               window.safari ? 'Safari' :
               'Unsupported Browser';
+var myId = 'cat';
 
 function chromeExtSend(msg) {
     return new Promise((resolve, reject) => {
