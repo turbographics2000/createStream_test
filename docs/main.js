@@ -60,6 +60,7 @@ function createStream({
     audio = false, 
     video = true
 } = {}) {
+    if(renderStreamId) cancelAnimationFrame(renderStreamId); // テスト用のコード 
     var proc = null;
     if(url) {
         if(typeof options.url !== 'string') {
