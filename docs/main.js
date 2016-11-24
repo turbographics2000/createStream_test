@@ -193,7 +193,7 @@ function createStream({
                 top: (cnv.height - (video.videoHeight * ratio)) / 2,
                 width: (media.videoWidth || media.naturalWidth) * ratio,
                 height: (media.videoHeight || media.naturalHeight) * ratio,
-                time: type === 'dummy',
+                time: media.constructor.name === 'HTMLImageElement',
                 stream
             };
             if(!renderStreamId) {
