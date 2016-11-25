@@ -96,12 +96,12 @@ function createStream({
 
     var proc = null;
     if(url) {
-        if(typeof options.url !== 'string') {
+        if(typeof url !== 'string') {
             proc.reject('createStream TypeError: options.fileURL is not a string.');
         } 
-        proc = fetch(options.url).then(response => response.blob()).then(file => {file});
+        proc = fetch(url).then(response => response.blob()).then(file => {file});
     } else if(file) {
-        if(options.file.constructor || options.file.constructor.name !== 'File') {
+        if(file.constructor || file.constructor.name !== 'File') {
             proc.reject('createStream TypeError: options.file is not a File.');
         }
         proc = Promise.resolve({file});
