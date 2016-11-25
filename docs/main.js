@@ -11,6 +11,37 @@ var streams = {};
 streams[myId] = {};
 window.MediaStream = window.MediaStream || window.webkitMediaStream;
 
+var logicoolSize = [
+    [160, 120],
+    [176, 144],
+    [320, 240],
+    [352, 288],
+    [432, 240],
+    [640, 360],
+    [640, 480],
+    [800, 448],
+    [864, 480],
+    [800, 600],
+    [1024, 576],
+    [960, 720],
+    [1280, 720],
+    [1600, 896],
+    [1920, 1080]
+];
+
+var BisonCamSize = [
+    [160, 120],
+    [176, 144],
+    [320, 240],
+    [352, 288],
+    [640, 360],
+    [640, 480],
+    [1280, 720],
+    [1280, 1024],
+    [1920, 1080]
+];
+
+
 function chromeExtSend(msg) {
     return new Promise((resolve, reject) => {
         chrome.runtime.sendMessage(extensionId, msg, res =>{
@@ -37,8 +68,84 @@ document.body.ondrop = function(evt) {
     }
 };
 
+for(let i = 1; i < 4; i++) {
+    for(let j = 100; j < 3500; j += 100) {
+        let btn = document.createElement('button');
+        let width = i === 2 ? 100 : j;
+        let height = i === 3 ? 100 : j;
+        let [expectWidth, expectHeight] = getExpectSize(width, height);
+        btn.textContent = `${width}x${height}`;
+        btn.onclick = function() {
+            try{
+                var size = this.textContent.split('x');
+                var width = +size[0];
+                var height = +size[1];
+                createStream({captureType: 'camera', width, height}).catch(err => {
+                    console.log(err);
+                });
+            } catch(ex) {
+                console.log(ex);
+            }
+        }
+        window['cameraButtonContainer' + i].appendChild(btn);
+    }
+}
+
+function getExpectSize(width, height) {
+    let min = 5000 * 5000;
+    let expectWidth, expectHeight;
+    for(var i = 0; i < logicoolSize.length; i++) {
+        var camWidth = logicoolSize[i][0];
+        var camHeight = logicoolSize[i][1];
+        //var diffMin = Math.min(Math.abs(width - camWidth), Math.abs(height - camHeight));
+        //var diffMin = Math.sqrt(Math.abs(width - camWidth) * Math.abs(width - camWidth) + Math.abs(height - camHeight) * Math.abs(height - camHeight));
+        var diffMin = Math.abs((width * height) - (camWidth * camHeight));
+        if(min > diffMin) {
+            min = diffMin;
+            expectWidth = camWidth;
+            expectHeight = camHeight;
+        } 
+    }
+    return [expectWidth, expectHeight];
+}
 
 [
+    [160, 120],
+    [176, 144],
+    [320, 240],
+    [352, 288],
+    [432, 240],
+    [640, 360],
+    [640, 480],
+    [800, 448],
+    [864, 480],
+    [800, 600],
+    [1024, 576],
+    [960, 720],
+    [1280, 720],
+    [1280, 1024],
+    [1600, 896],
+    [1920, 1080]
+].forEach(resolution => {
+    var btn = document.createElement('button');
+    btn.textContent = resolution[0] + 'x' + resolution[1];
+    btn.onclick = function() {
+        try{
+            var size = this.textContent.split('x');
+            var width = +size[0];
+            var height = +size[1];
+            createStream({captureType: 'camera', width, height}).catch(err => {
+                console.log(err);
+            });
+        } catch(ex) {
+            console.log(ex);
+        }
+    }
+    cameraButtonContainer4.appendChild(btn);
+});
+
+[
+    'camera',
     'application',
     'browser',
     'monitor',
@@ -51,7 +158,6 @@ document.body.ondrop = function(evt) {
     ['screen', 'tab', 'window'],
     ['screen', 'hoge'],
     ['tab', 'hoge', 'window'],
-    'camera',
     'dummy'
 ].forEach(val => {
     var btn = document.createElement('button');
@@ -76,7 +182,8 @@ function createStream({
     width = 240, 
     height = 180, 
     audio = false, 
-    video = true
+    video = true,
+    constraints = null
 } = {}) {
     // -------------------------------------------------
     // テスト用コード
@@ -97,12 +204,12 @@ function createStream({
     var proc = null;
     if(url) {
         if(typeof url !== 'string') {
-            proc.reject('createStream TypeError: options.fileURL is not a string.');
+            proc = Promise.reject('createStream TypeError: options.fileURL is not a string.');
         } 
         proc = fetch(url).then(response => response.blob()).then(file => {file});
     } else if(file) {
-        if(file.constructor || file.constructor.name !== 'File') {
-            proc.reject('createStream TypeError: options.file is not a File.');
+        if(!file.constructor || file.constructor.name !== 'File') {
+            proc = Promise.reject('createStream TypeError: options.file is not a File.');
         }
         proc = Promise.resolve({file});
     } else if(captureType) {
@@ -111,38 +218,38 @@ function createStream({
         var prevProc = null;
         if(captureType === 'camera') {
             prevProc = Promise.resolve(video ? {width, height} : true);
-        } else if(captureType === 'dummy') {
-
         } else {
-            if(navigator.mediaDevices.getDisplayMedia) {
-                if(['application', 'browser', 'monitor', 'window'].includes(captureType)) {
-                    prevProc = Promise.resolve({displaySurface: captureType});
-                }
-                captureMethod = 'getDisplayMedia';
-            } 
-            if(!prevProc) {
-                if(browserType === 'Chrome') {
-                    captureType = [].concat(captureType);
-                    if(captureType.every(val => ['screen', 'window', 'tab'].includes(val))) {
-                        prevProc = chromeExtSend(captureType).then(streamId => {
-                            if(streamId) {
-                                return {
-                                    mandatory: {
-                                        chromeMediaSource: 'desktop',
-                                        chromeMediaSourceId: streamId,
-                                        maxWidth: width,
-                                        maxHeight: height
-                                    }
-                                };
-                            } else {
-                                throw {name: 'createStream', message: 'user canceled the select target prompt.'};
-                            }
-                        });
+            if(!constraints) {
+                if(navigator.mediaDevices.getDisplayMedia) {
+                    if(['application', 'browser', 'monitor', 'window'].includes(captureType)) {
+                        prevProc = Promise.resolve({displaySurface: captureType});
                     }
-                } else if(browserType === 'Firefox') {
-                    if(typeof captureType === 'string') {
-                        if(['application', 'screen', 'window'].includes(captureType)) {
-                            prevProc = Promise.resolve({mediaSource: captureType});
+                    captureMethod = 'getDisplayMedia';
+                }
+                if(!prevProc) {
+                    if(browserType === 'Chrome') {
+                        captureType = captureType.split('-');
+                        if(captureType.every(val => ['screen', 'window', 'tab'].includes(val))) {
+                            prevProc = chromeExtSend(captureType).then(streamId => {
+                                if(streamId) {
+                                    return {
+                                        mandatory: {
+                                            chromeMediaSource: 'desktop',
+                                            chromeMediaSourceId: streamId,
+                                            maxWidth: width,
+                                            maxHeight: height
+                                        }
+                                    };
+                                } else {
+                                    throw {name: 'createStream', message: 'user canceled the select target prompt.'};
+                                }
+                            });
+                        }
+                    } else if(browserType === 'Firefox') {
+                        if(typeof captureType === 'string') {
+                            if(['application', 'screen', 'window'].includes(captureType)) {
+                                prevProc = Promise.resolve({mediaSource: captureType});
+                            }
                         }
                     }
                 }
@@ -154,10 +261,17 @@ function createStream({
                 message: 'captureType error: "' + captureType + '" is not support.'
             });
         } else {
-            proc = prevProc.then(videoConstraints => {
-                return navigator.mediaDevices[captureMethod]({video: videoConstraints, audio})
-                        .then(stream => {return {stream}});
-            });
+            if(constraints) {
+                proc = prevProc.then(videoConstraints => {
+                    return navigator.mediaDevices[captureMethod](constraints)
+                            .then(stream => {return {stream}});
+                });
+            } else {
+                proc = prevProc.then(videoConstraints => {
+                    return navigator.mediaDevices[captureMethod]({video: videoConstraints, audio})
+                            .then(stream => {return {stream}});
+                });
+            }
         }
     } else {
         proc = Promise.resolve();
@@ -175,6 +289,7 @@ function createStream({
                 media.onloadedmetadata = function() {
                     var ret = {};
                     if(this.captureStream) {
+                        this.play();
                         ret.stream = this.captureStream();
                     } else {
                         if(media.audioTracks.length) {
@@ -263,4 +378,8 @@ function renderDummyVideoTrack() {
             ctx.fillText(dtStr, cnv.width - left - 3, cnv.height - top - 3);
         }
     };
+}
+
+preview.onloadedmetadata = function() {
+    previewSize.textContent = preview.videoWidth + "x" + preview.videoHeight;
 }

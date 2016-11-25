@@ -5,10 +5,34 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="style.css" rel="stylesheet">
+        <style>
+            html, body{
+                width: 100%;
+                height: 100%;
+            }
+            .button-container {
+                margin-bottom: 10px;
+            }
+        </style>
     </head>
     <body>
-        <div id="btnContainer" style="position:absolute; left: 0; top: 0; width: 100%"></div>
-        <video id="preview" width="640" height="480" style="position:absolute; top:50px" autoplay></video>
+        <div id="cameraButtonContainer1" class="button-container">
+            <div style="padding:4px">カメラ サイズ1</div>
+        </div>
+        <div id="cameraButtonContainer2" class="button-container">
+            <div style="padding:4px">カメラ サイズ2</div>
+        </div>
+        <div id="cameraButtonContainer3" class="button-container">
+            <div style="padding:4px">カメラ サイズ3</div>
+        </div>
+        <div id="cameraButtonContainer4" class="button-container">
+            <div style="padding:4px">カメラ サイズ4</div>
+        </div>
+        <div id="btnContainer" class="button-container">
+            <div style="padding:4px">ストリームタイプ</div>
+        </div>
+        <video id="preview" width="320" height="240" style="background:black" autoplay></video>
+        <div id="previewSize"></div>
         <script src="main.js"></script>
     </body>
 </html>
