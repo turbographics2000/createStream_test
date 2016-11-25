@@ -21,7 +21,7 @@ function chromeExtSend(msg) {
 
 document.body.ondragover = function(evt) {
     evt.preventDefault();
-}
+};
 
 document.body.ondrop = function(evt) {
     var video = document.createElement('video');
@@ -35,7 +35,7 @@ document.body.ondrop = function(evt) {
             createStream({file:playableFiles[i]});
         }
     }
-}
+};
 
 
 [
