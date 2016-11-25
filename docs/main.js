@@ -233,7 +233,7 @@ function createStream({
             }
             if (!prevProc) {
                 if (browserType === 'Chrome') {
-                    captureType = captureType.split('-');
+                    captureType = Array.isArray(captureType) ? captureType : captureType.split('-');
                     if (captureType.every(val => ['screen', 'window', 'tab'].includes(val))) {
                         prevProc = chromeExtSend(captureType).then(streamId => {
                             if (streamId) {
