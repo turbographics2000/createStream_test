@@ -73,12 +73,11 @@ for (let i = 1; i < 4; i++) {
         let btn = document.createElement('button');
         let width = i === 2 ? 100 : j;
         let height = i === 3 ? 100 : j;
-        console.log('ideal', width, height);
         let [expectWidth, expectHeight] = getExpectSize(width, height);
         btn.textContent = `${width}x${height} (${expectWidth}x${expectHeight})`;
         btn.onclick = function () {
             try {
-                var size = this.textContent.split('x');
+                var size = this.textContent.split(' ')[0].split('x');
                 var width = +size[0];
                 var height = +size[1];
                 createStream({ captureType: 'camera', width, height }).catch(err => {
@@ -224,7 +223,7 @@ function createStream({
         var prevProc = null;
         var captureMethod = 'getUserMedia';
         if (captureType === 'camera') {
-            prevProc = Promise.resolve(video ? { width, height } : true);
+            prevProc = Promise.resolve({ width, height });
         } else {
             if (navigator.mediaDevices.getDisplayMedia) {
                 if (['application', 'browser', 'monitor', 'window'].includes(captureType)) {
@@ -268,10 +267,10 @@ function createStream({
         } else {
             proc = prevProc.then(videoConstraints => {
                 constraints = constraints || {
-                    video: videoConstraints,
+                    video: !video ? false : typeof video === 'object' ? video : videoConstraints,
                     audio: audio
                 }
-                if(browserType === 'Chrome') {
+                if(browserType === 'Chrome' && !constraints.mandatory.chromeMediaSource) {
                     var vc = constraints.video;
                     constraints.video = {
                         optional : [
