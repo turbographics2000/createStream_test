@@ -19,6 +19,24 @@ function chromeExtSend(msg) {
     });
 }
 
+document.body.ondragover = function(evt) {
+    evt.preventDefault();
+}
+
+document.body.ondrop = function(evt) {
+    var video = document.createElement('video');
+    evt.preventDefault();
+    let files = Array.from(evt.dataTransfer.files);
+    var streamCnt = Object.keys(streams[myId]).length;
+    var playableFiles = files.filter(file => ['maybe', 'probably'].includes(video.canPlayType(file.type)));
+    var addCnt = Math.min(3 - streamCnt, playableFiles.length);
+    if(addCnt) {
+        for(var i = 0; i < addCnt; i++){
+            createStream({file:playableFiles[i]});
+        }
+    }
+}
+
 
 [
     'application',
