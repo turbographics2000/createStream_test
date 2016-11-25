@@ -270,7 +270,8 @@ function createStream({
                     video: !video ? false : typeof video === 'object' ? video : videoConstraints,
                     audio: audio
                 }
-                if(browserType === 'Chrome' && !constraints.mandatory.chromeMediaSource) {
+                if(browserType === 'Chrome' && 
+                    !(constraints.video && constraints.video.mandatory && constraints.video.mandatory.chromeMediaSource)) {
                     var vc = constraints.video;
                     constraints.video = {
                         optional : [
