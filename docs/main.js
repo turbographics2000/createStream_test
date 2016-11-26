@@ -12,35 +12,85 @@ streams[myId] = {};
 window.MediaStream = window.MediaStream || window.webkitMediaStream;
 
 var logicoolSize = [
-    [160, 120],
-    [176, 144],
-    [320, 240],
-    [352, 288],
-    [432, 240],
-    [640, 360],
-    [640, 480],
-    [800, 448],
-    [864, 480],
-    [800, 600],
-    [1024, 576],
-    [960, 720],
-    [1280, 720],
-    [1600, 896],
-    [1920, 1080]
+    { width: 160, height: 120 },
+    { width: 176, height: 144 },
+    { width: 320, height: 240 },
+    { width: 352, height: 288 },
+    { width: 432, height: 240 },
+    { width: 640, height: 360 },
+    { width: 640, height: 480 },
+    { width: 800, height: 448 },
+    { width: 864, height: 480 },
+    { width: 800, height: 600 },
+    { width: 960, height: 720 },
+    { width: 1024, height: 576 },
+    { width: 1280, height: 720 },
+    { width: 1600, height: 896 },
+    { width: 1920, height: 1080 }
 ];
 
 var BisonCamSize = [
-    [160, 120],
-    [176, 144],
-    [320, 240],
-    [352, 288],
-    [640, 360],
-    [640, 480],
-    [1280, 720],
-    [1280, 1024],
-    [1920, 1080]
+    { width: 160, height: 120 },
+    { width: 176, height: 144 },
+    { width: 320, height: 240 },
+    { width: 352, height: 288 },
+    { width: 640, height: 360 },
+    { width: 640, height: 480 },
+    { width: 1280, height: 720 },
+    { width: 1280, height: 1024 },
+    { width: 1920, height: 1080 }
 ];
 
+var constraintsPatterns = [
+    null,
+    { audio: false, video: true },
+    { audio: true, video: true },
+    {
+        video: {
+            width: 320,
+            height: 240,
+            aspectRatio: 16 / 9,
+            frameRate: 15,
+            facingMode: 'user'
+        },
+        audio: {
+            volume: 0.3,
+            sampleRate: 1120,
+            sampleSize: 8,
+            echoCancellation: true,
+            latency: 0,
+            channelCount: 1
+        },
+        deviceId: null,
+        groupId: null
+    }
+]
+
+var dummyPatterns = [
+    'dummy'
+];
+
+var screenCaptureAPIPatterns = [
+    'application',
+    'browser',
+    'monitor',
+    'window',
+];
+
+var chromeScreenCapturePatterns = [
+    ['screen', 'tab'],
+    ['screen', 'window'],
+    ['tab', 'window'],
+    ['screen', 'tab', 'window'],
+    ['screen', 'hoge'],
+    ['tab', 'hoge', 'window'],
+];
+
+var firefoxScreenCapturePatterns = [
+    'window',
+    'application',
+    'screen'
+];
 
 function chromeExtSend(msg) {
     return new Promise((resolve, reject) => {
@@ -68,28 +118,106 @@ document.body.ondrop = function (evt) {
     }
 };
 
-for (let i = 1; i < 4; i++) {
-    for (let j = 100; j < 3500; j += 100) {
-        let btn = document.createElement('button');
-        let width = i === 2 ? 100 : j;
-        let height = i === 3 ? 100 : j;
-        let [expectWidth, expectHeight] = getExpectSize(width, height);
-        btn.textContent = `${width}x${height} (${expectWidth}x${expectHeight})`;
+function createButtonContainer(capText) {
+    var buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('button-container');
+    var caption = document.createElement('div');
+    caption.textContent = capText;
+    caption.classList.add('caption');
+    buttonContainer.appendChild(caption);
+    testPatternContainer.appendChild(buttonContainer);
+    return buttonContainer;
+}
+
+function createTestButton(btnText) {
+    let btn = document.createElement('button');
+    btn.classList.add('test-button');
+    btn.textContent = btnText;
+    btn.onclick = sizePatternButtonOnClick;
+    return btn;
+}
+
+function createSizePatternTestButton() {
+    for (let i = 0; i < 3; i++) {
+        let buttonContainer = createButtonContainer(`カメラサイズ (${['width = height', 'width = 100 固定', 'height = 100 固定'][i]})`);
+        for (let j = 100; j < 3500; j += 100) {
+            let width = i === 1 ? 100 : j;
+            let height = i === 2 ? 100 : j;
+            let [expectWidth, expectHeight] = GetBestFitnessDistance(logicoolSize, {width, height});
+            let btn = createTestButton(`${width}x${height} (${expectWidth}x${expectHeight})`);
+            buttonContainer.appendChild(btn);
+        }
+    }
+}
+
+function createScreenCaptureAPITestButton() {
+    let buttonContainer = createButtonContainer('Screen Capture API 向けテスト');
+    screenCaptureAPIPatterns.forEach(pattern => {
+        let btn = createTestButton(pattern);
+        buttonContainer.appendChild(btn);
+    });
+}
+
+function createChromeScreenCaptureTestButton() {
+    let buttonContainer = createButtonContainer('Chrome向けスクリーンキャプチャテスト');
+    chromeScreenCapturePatterns.forEach(pattern => {
+        let btn = createTestButton(pattern);
+        buttonContainer.appendChild(btn);
+    });
+}
+
+function createFirefoxScreenCaptureTestButton() {
+    let buttonContainer = createButtonContainer('Firefox向けスクリーンキャプチャテスト');
+    firefoxScreenCapturePatterns.forEach(pattern => {
+        let btn = createTestButton(pattern);
+        buttonContainer.appendChild(btn);
+    });
+}
+
+function createRealSizePatternTestButton() {
+    let buttonContainer = createButtonContainer('実サイズ');
+    logicoolSize.forEach(([width, height]) => {
+        let btn = createTestButton(`${width}x${height}`);
+        buttonContainer.appendChild(btn);
+    });
+}
+
+function createCaptureTypeTestButton() {
+    let buttonContainer = createButtonContainer('ダミーパターン (画像とWeb Audio APIからストリームを生成)');
+    dummyPatterns.forEach(val => {
+        let btn = createTestButton([].concat(val).join('-').toString());
+        btn.classList.add('captype');
         btn.onclick = function () {
             try {
-                var size = this.textContent.split(' ')[0].split('x');
-                var width = +size[0];
-                var height = +size[1];
-                createStream({ captureType: 'camera', width, height }).catch(err => {
-                    console.log(err);
-                });
+                createStream({ captureType: this.textContent === 'dummy' ? null : this.textContent })
+                    .then(_ => errorMessage.textContent = '')
+                    .catch(err => {
+                        errorMessage.textContent = (err);
+                    });
+
             } catch (ex) {
                 console.log(ex);
             }
         }
-        window['cameraButtonContainer' + i].appendChild(btn);
-    }
+        buttonContainer.appendChild(btn);
+    });
 }
+
+function sizePatternButtonOnClick() {
+    var size = this.textContent.split(' ')[0].split('x');
+    var width = +size[0];
+    var height = +size[1];
+    createStream({ captureType: 'camera', width, height }).catch(err => {
+        console.log(err);
+    });
+}
+
+createSizePatternTestButton();
+//createRealSizePatternTestButton();
+createCaptureTypeTestButton();
+createScreenCaptureAPITestButton();
+createChromeScreenCaptureTestButton();
+createFirefoxScreenCaptureTestButton();
 
 function getExpectSize(width, height) {
     let min = 5000 * 5000;
@@ -114,73 +242,6 @@ function getExpectSize(width, height) {
     console.log(width + 'x' + height, expectWidth + 'x' + expectHeight);
     return [expectWidth, expectHeight];
 }
-
-[
-    [160, 120],
-    [176, 144],
-    [320, 240],
-    [352, 288],
-    [432, 240],
-    [640, 360],
-    [640, 480],
-    [800, 448],
-    [864, 480],
-    [800, 600],
-    [1024, 576],
-    [960, 720],
-    [1280, 720],
-    [1280, 1024],
-    [1600, 896],
-    [1920, 1080]
-].forEach(resolution => {
-    var btn = document.createElement('button');
-    btn.textContent = resolution[0] + 'x' + resolution[1];
-    btn.onclick = function () {
-        try {
-            var size = this.textContent.split('x');
-            var width = +size[0];
-            var height = +size[1];
-            createStream({ captureType: 'camera', width, height })
-                .then(_ => errorMessage.textContent = '')
-                .catch(err => {
-                    errorMessage.textContent = (err.message);
-                });
-        } catch (ex) {
-            console.log(ex);
-        }
-    }
-    cameraButtonContainer4.appendChild(btn);
-});
-
-[
-    'camera',
-    'application',
-    'browser',
-    'monitor',
-    'window',
-    'screen',
-    'tab',
-    ['screen', 'tab'],
-    ['screen', 'window'],
-    ['tab', 'window'],
-    ['screen', 'tab', 'window'],
-    ['screen', 'hoge'],
-    ['tab', 'hoge', 'window'],
-    'dummy'
-].forEach(val => {
-    var btn = document.createElement('button');
-    btn.textContent = [].concat(val).join('-').toString();
-    btn.onclick = function () {
-        try {
-            createStream({ captureType: this.textContent === 'dummy' ? null : this.textContent }).catch(err => {
-                console.log(err);
-            });
-        } catch (ex) {
-            console.log(ex);
-        }
-    }
-    btnContainer.appendChild(btn);
-});
 
 
 function createStream({
@@ -221,7 +282,7 @@ function createStream({
         }
         proc = Promise.resolve({ file });
     } else if (captureType) {
-        if(typeof captureType !== 'string' && !(Array.isArray(captureType) && captureType.every(val => typeof val === 'string'))) {
+        if (typeof captureType !== 'string' && !(Array.isArray(captureType) && captureType.every(val => typeof val === 'string'))) {
             return Promise.reject('createStream TypeError: captureType is not a string or string array.');
         }
         if (captureType.includes('-')) captureType = captureType.split('-');
@@ -271,10 +332,10 @@ function createStream({
                     video: !video ? false : typeof video === 'object' ? video : videoConstraints,
                     audio: audio
                 }
-                if(browserType === 'Chrome' && !Array.isArray(captureType)) {
+                if (browserType === 'Chrome' && !Array.isArray(captureType)) {
                     var vc = constraints.video;
                     constraints.video = {
-                        optional : [
+                        optional: [
                             { minWidth: vc.width },
                             { maxWidth: vc.width },
                             { minHeight: vc.height },
@@ -499,3 +560,41 @@ var cons = {
 shimConstraints_(cons, res => {
     console.log(JSON.stringify(res, null, 4));
 })
+
+const UINT32_MAX = 4294967295;
+function GetBestFitnessDistance(candidateSet, constraints) {
+    var first = true;
+    for (var i = 0, l = candidateSet.length; i < l; i++) {
+        candidateSet[i].distance = GetFitnessDistance(candidateSet[i], constraints);
+        console.log('distance', candidateSet[i].width + 'x' + candidateSet[i].height, constraints.width + 'x' + constraints.height, candidateSet[i].distance);
+    }
+    var bestCandidate = TrimLessFitCandidates(candidateSet);
+    return [bestCandidate.width, bestCandidate.height];
+}
+
+function TrimLessFitCandidates(candidateSet) {
+    var best = Math.min(...candidateSet.map(val => val.distance));
+    var candidate = candidateSet.filter(val => val.distance === best);
+    return candidate[0];
+}
+
+function GetFitnessDistance(aCandidate, aConstraints) {
+    var distance =
+        // (FitnessDistance(aDeviceId, aConstraints.mDeviceId)) +
+        // (FitnessDistance(mFacingMode, aConstraints.mFacingMode)) +
+        (aCandidate.width ? FitnessDistance(aCandidate.width, aConstraints.width) : 0) +
+        (aCandidate.height ? FitnessDistance(aCandidate.height, aConstraints.height) : 0) //+
+    // (aCandidate.maxFPS ? FitnessDistance(double(aCandidate.maxFPS), aConstraints.mFrameRate) : 0);
+    return distance;
+}
+
+function FitnessDistance(aN, aRange) {
+    // if (aRange.mMin > aN || aRange.mMax < aN) {
+    //     return UINT32_MAX;
+    // }
+    // if (aN == aRange.mIdeal.valueOr(aN)) {
+    //     return 0;
+    // }
+    if (aN === aRange) return 0;
+    return (Math.abs(aN - aRange) * 1000) / Math.max(Math.abs(aN), Math.abs(aRange));
+}

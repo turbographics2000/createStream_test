@@ -1,0 +1,41 @@
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+#container {
+    width: 800px;
+    margin: auto;
+}
+
+#videoContainer {
+    display: inline-block;
+    width: 400px;
+    vertical-align: top;
+    position: fixed;
+    left: 10px;
+    top: 10px;
+}
+
+#testPatternContainer {
+    display: inline-block;
+    width: 800px;
+}
+
+.caption {
+    padding: 4px;
+}
+
+.button-container {
+    margin-bottom: 10px;
+}
+
+.test-button {
+    display: inline-block;
+    width: 100px;
+}
+.test-button.captype{
+    width: 200px;
+}
