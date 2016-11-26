@@ -140,9 +140,11 @@ function getExpectSize(width, height) {
             var size = this.textContent.split('x');
             var width = +size[0];
             var height = +size[1];
-            createStream({ captureType: 'camera', width, height }).catch(err => {
-                console.log(err);
-            });
+            createStream({ captureType: 'camera', width, height })
+                .then(_ => errorMessage.textContent = '')
+                .catch(err => {
+                    errorMessage.textContent = (err.message);
+                });
         } catch (ex) {
             console.log(ex);
         }
@@ -210,15 +212,18 @@ function createStream({
     var proc = null;
     if (url) {
         if (typeof url !== 'string') {
-            proc = Promise.reject('createStream TypeError: options.fileURL is not a string.');
+            return Promise.reject('createStream TypeError: url is not a string.');
         }
         proc = fetch(url).then(response => response.blob()).then(file => ({ file }));
     } else if (file) {
         if (!file.constructor || file.constructor.name !== 'File') {
-            proc = Promise.reject('createStream TypeError: options.file is not a File.');
+            return Promise.reject('createStream TypeError: file is not a File.');
         }
         proc = Promise.resolve({ file });
     } else if (captureType) {
+        if(typeof captureType !== 'string' && !(Array.isArray(captureType) && captureType.every(val => typeof val === 'string'))) {
+            return Promise.reject('createStream TypeError: captureType is not a string or string array.');
+        }
         if (captureType.includes('-')) captureType = captureType.split('-');
         var prevProc = null;
         var captureMethod = 'getUserMedia';
@@ -234,7 +239,8 @@ function createStream({
             if (!prevProc) {
                 if (browserType === 'Chrome') {
                     captureType = Array.isArray(captureType) ? captureType : captureType.split('-');
-                    if (captureType.every(val => ['screen', 'window', 'tab'].includes(val))) {
+                    captureType = captureType.filter(val => ['screen', 'window', 'tab'].includes(val));
+                    if (captureType.length) {
                         prevProc = chromeExtSend(captureType).then(streamId => {
                             if (streamId) {
                                 return {
@@ -245,8 +251,6 @@ function createStream({
                                         maxHeight: height
                                     }
                                 };
-                            } else {
-                                throw { name: 'createStream', message: 'user canceled the select target prompt.' };
                             }
                         });
                     }
@@ -260,10 +264,7 @@ function createStream({
             }
         }
         if (!prevProc) {
-            proc = Promise.reject({
-                name: 'createStream',
-                message: 'captureType error: "' + captureType + '" is not support.'
-            });
+            return Promise.reject('captureType error: "' + captureType + '" is not support.');
         } else {
             proc = prevProc.then(videoConstraints => {
                 constraints = constraints || {
@@ -288,7 +289,6 @@ function createStream({
     } else {
         proc = Promise.resolve();
     }
-
     return proc.then(({stream = null, file = null} = {}) => {
         if (stream) return { stream };
         return new Promise((resolve, reject) => {
