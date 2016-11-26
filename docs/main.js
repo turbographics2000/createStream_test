@@ -129,11 +129,11 @@ function createButtonContainer(capText) {
     return buttonContainer;
 }
 
-function createTestButton(btnText) {
+function createTestButton(btnText, onclick) {
     let btn = document.createElement('button');
     btn.classList.add('test-button');
     btn.textContent = btnText;
-    btn.onclick = sizePatternButtonOnClick;
+    btn.onclick = onclick.bind(btn);
     return btn;
 }
 
@@ -144,7 +144,7 @@ function createSizePatternTestButton() {
             let width = i === 1 ? 100 : j;
             let height = i === 2 ? 100 : j;
             let [expectWidth, expectHeight] = GetBestFitnessDistance(logicoolSize, {width, height});
-            let btn = createTestButton(`${width}x${height} (${expectWidth}x${expectHeight})`);
+            let btn = createTestButton(`${width}x${height} (${expectWidth}x${expectHeight})`, sizePatternButtonOnClick);
             buttonContainer.appendChild(btn);
         }
     }
@@ -153,7 +153,9 @@ function createSizePatternTestButton() {
 function createScreenCaptureAPITestButton() {
     let buttonContainer = createButtonContainer('Screen Capture API 向けテスト');
     screenCaptureAPIPatterns.forEach(pattern => {
-        let btn = createTestButton(pattern);
+        let btn = createTestButton(pattern, function() {
+            createStream({ captureType: this.textContent });
+        });
         buttonContainer.appendChild(btn);
     });
 }
@@ -161,7 +163,9 @@ function createScreenCaptureAPITestButton() {
 function createChromeScreenCaptureTestButton() {
     let buttonContainer = createButtonContainer('Chrome向けスクリーンキャプチャテスト');
     chromeScreenCapturePatterns.forEach(pattern => {
-        let btn = createTestButton(pattern);
+        let btn = createTestButton(pattern, function() {
+            createStream({ captureType: this.textContent });
+        });
         buttonContainer.appendChild(btn);
     });
 }
@@ -169,7 +173,9 @@ function createChromeScreenCaptureTestButton() {
 function createFirefoxScreenCaptureTestButton() {
     let buttonContainer = createButtonContainer('Firefox向けスクリーンキャプチャテスト');
     firefoxScreenCapturePatterns.forEach(pattern => {
-        let btn = createTestButton(pattern);
+        let btn = createTestButton(pattern, function() {
+            createStream({ captureType: this.textContent });
+        });
         buttonContainer.appendChild(btn);
     });
 }
@@ -185,20 +191,14 @@ function createRealSizePatternTestButton() {
 function createCaptureTypeTestButton() {
     let buttonContainer = createButtonContainer('ダミーパターン (画像とWeb Audio APIからストリームを生成)');
     dummyPatterns.forEach(val => {
-        let btn = createTestButton([].concat(val).join('-').toString());
+        let btn = createTestButton([].concat(val).join('-').toString(), function() {
+            createStream({ captureType: this.textContent === 'dummy' ? null : this.textContent })
+                .then(_ => errorMessage.textContent = '')
+                .catch(err => {
+                    errorMessage.textContent = (err);
+                });
+        });
         btn.classList.add('captype');
-        btn.onclick = function () {
-            try {
-                createStream({ captureType: this.textContent === 'dummy' ? null : this.textContent })
-                    .then(_ => errorMessage.textContent = '')
-                    .catch(err => {
-                        errorMessage.textContent = (err);
-                    });
-
-            } catch (ex) {
-                console.log(ex);
-            }
-        }
         buttonContainer.appendChild(btn);
     });
 }
@@ -218,31 +218,6 @@ createCaptureTypeTestButton();
 createScreenCaptureAPITestButton();
 createChromeScreenCaptureTestButton();
 createFirefoxScreenCaptureTestButton();
-
-function getExpectSize(width, height) {
-    let min = 5000 * 5000;
-    let expectWidth, expectHeight;
-    for (var i = 0; i < logicoolSize.length; i++) {
-        var camWidth = logicoolSize[i][0];
-        var camHeight = logicoolSize[i][1];
-        //var diffMin = Math.min(Math.abs(width - camWidth), Math.abs(height - camHeight));
-        //var diffMin = Math.sqrt(Math.abs(width - camWidth) * Math.abs(width - camWidth) + Math.abs(height - camHeight) * Math.abs(height - camHeight));
-        // 実測
-        // 100x200 => 176x144
-        var fdWidth = Math.abs(camWidth - width) / Math.max(camWidth, width);
-        var fdHeight = Math.abs(camHeight - height) / Math.max(camHeight, height);
-        //console.log('fd', fdWidth, fdHeight, camWidth, camHeight);
-        var diffMin = fdWidth + fdHeight;
-        if (min > diffMin) {
-            min = diffMin;
-            expectWidth = camWidth;
-            expectHeight = camHeight;
-        }
-    }
-    console.log(width + 'x' + height, expectWidth + 'x' + expectHeight);
-    return [expectWidth, expectHeight];
-}
-
 
 function createStream({
     url = null,
