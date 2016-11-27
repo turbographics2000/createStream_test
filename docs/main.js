@@ -355,35 +355,35 @@ var constraintableRange = {
     aspectRatio: { min: 100, max: 0 },
 }
 function rangeCheck() {
-    // rangeCheckProc('video', 'width', 'min', 100000, 100000 / 2, 'int').then(val => {
-    //     constraintableRange.width.min = val;
-    // }).then(_ => {
-    //     return rangeCheckProc('video', 'width', 'max', 0, 100000 / 2, 'int');
-    // }).then(val => {
-    //     constraintableRange.width.max = val;
-    // }).then(_ => {
-    //     return rangeCheckProc('video', 'height', 'min', 100000, 100000 / 2, 'int');
-    // }).then(val => {
-    //     constraintableRange.height.min = val;
-    // }).then(_ => {
-    //     return rangeCheckProc('video', 'height', 'max', 0, 100000 / 2, 'int');
-    // }).then(val => {
-    //     constraintableRange.height.max = val;
-    // }).then(_ => {
-    //     previewSize.innerHTML = JSON.stringify(constraintableRange, null, 2).replace(/\n/g, '<br>');
-    // });
-    Promise.all([
-        rangeCheckProc('video', 'width', 'min', 100000, 100000 / 2, 'int'),
-        rangeCheckProc('video', 'width', 'max', 0, 100000 / 2, 'int'),
-        rangeCheckProc('video', 'height', 'min', 100000, 100000 / 2, 'int'),
-        rangeCheckProc('video', 'height', 'max', 0, 100000 / 2, 'int'),
-    ]).then(([minWidth, maxWidth, minHeight, maxHeight]) => {
-        constraintableRange.width.min = minWidth;
-        constraintableRange.width.max = maxWidth;
-        constraintableRange.height.min = minHeight;
-        constraintableRange.height.max = maxHeight;
+    rangeCheckProc('video', 'width', 'min', 100000, 100000 / 2, 'int').then(val => {
+        constraintableRange.width.min = val;
+    }).then(_ => {
+        return rangeCheckProc('video', 'width', 'max', 0, 100000 / 2, 'int');
+    }).then(val => {
+        constraintableRange.width.max = val;
+    }).then(_ => {
+        return rangeCheckProc('video', 'height', 'min', 100000, 100000 / 2, 'int');
+    }).then(val => {
+        constraintableRange.height.min = val;
+    }).then(_ => {
+        return rangeCheckProc('video', 'height', 'max', 0, 100000 / 2, 'int');
+    }).then(val => {
+        constraintableRange.height.max = val;
+    }).then(_ => {
         previewSize.innerHTML = JSON.stringify(constraintableRange, null, 2).replace(/\n/g, '<br>');
     });
+    // Promise.all([
+    //     rangeCheckProc('video', 'width', 'min', 100000, 100000 / 2, 'int'),
+    //     rangeCheckProc('video', 'width', 'max', 0, 100000 / 2, 'int'),
+    //     rangeCheckProc('video', 'height', 'min', 100000, 100000 / 2, 'int'),
+    //     rangeCheckProc('video', 'height', 'max', 0, 100000 / 2, 'int'),
+    // ]).then(([minWidth, maxWidth, minHeight, maxHeight]) => {
+    //     constraintableRange.width.min = minWidth;
+    //     constraintableRange.width.max = maxWidth;
+    //     constraintableRange.height.min = minHeight;
+    //     constraintableRange.height.max = maxHeight;
+    //     previewSize.innerHTML = JSON.stringify(constraintableRange, null, 2).replace(/\n/g, '<br>');
+    // });
 
     //     constraintableRange.width.min = val;
     // }).then(_ => {
