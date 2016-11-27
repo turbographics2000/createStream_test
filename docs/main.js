@@ -377,7 +377,7 @@ function rangeCheck() {
         rangeCheckProc('video', 'width', 'max', 0, 100000 / 2, 'int'),
         rangeCheckProc('video', 'height', 'min', 100000, 100000 / 2, 'int'),
         rangeCheckProc('video', 'height', 'max', 0, 100000 / 2, 'int'),
-    ]).then((minWidth, maxWidth, minHeight, maxHeight) => {
+    ]).then(([minWidth, maxWidth, minHeight, maxHeight]) => {
         constraintableRange.width.min = minWidth;
         constraintableRange.width.max = maxWidth;
         constraintableRange.height.min = minHeight;
