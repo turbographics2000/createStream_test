@@ -366,7 +366,7 @@ function rangeCheck() {
         }).then(val => {
             constraintableRange.height.min = val;
         }).then(_ => {
-            rangeCheckProc('video', 'height', 'max', 0, 100000 / 2, 'int');
+            return rangeCheckProc('video', 'height', 'max', 0, 100000 / 2, 'int');
         }).then(val => {
             constraintableRange.height.max = val;
         }).then(_ => {
