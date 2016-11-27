@@ -301,16 +301,7 @@ function sizePatternButtonOnClick() {
     });
 }
 
-createSizePatternTestButton();
-createExactSizePatternTestButton();
-createRealSizePatternTestButton();
-createCaptureTypeTestButton();
-createConstraintsTestButton();
-createScreenCaptureAPITestButton();
-createChromeScreenCaptureTestButton();
-createFirefoxScreenCaptureTestButton();
-
-function rangeCheck(trackName, propertyName, subPropertyName, val, half, type, prevState) {
+function rangeCheckProc(trackName, propertyName, subPropertyName, val, half, type, prevState) {
     var constraints = {
         [trackName]: {
             [propertyName]: {
@@ -355,14 +346,35 @@ var constraintableRange = {
     frameRate: { min: 500, max: 0 },
     aspectRatio: { min: 100, max: 0 },
 }
-Promise.all([
-rangeCheck('video', 'width', 'min', 10000000, 10000000/2, 'int'),
-rangeCheck('video', 'height', 'min', 10000000, 10000000/2, 'int'),
-rangeCheck('video', 'width', 'max', 0, 10000000/2, 'int'),
-rangeCheck('video', 'height', 'max', 0, 10000000/2, 'int')
-]).then(([minWidth, minHeight, maxWidth, maxHeight]) => {
-    console.log(minWidth, maxWidth, minHeight, maxHeight);
-})
+function rangeCheck() {
+    Promise.all([
+        rangeCheckProc('video', 'width', 'min', 10000000, 10000000 / 2, 'int'),
+        rangeCheckProc('video', 'height', 'min', 10000000, 10000000 / 2, 'int'),
+        rangeCheckProc('video', 'width', 'max', 0, 10000000 / 2, 'int'),
+        rangeCheckProc('video', 'height', 'max', 0, 10000000 / 2, 'int')
+    ]).then(([minWidth, minHeight, maxWidth, maxHeight]) => {
+        console.log(minWidth, maxWidth, minHeight, maxHeight);
+    });
+}
+
+function createRangeCheckButton() {
+    let buttonContainer = createButtonContainer('Rangeチェック');
+    let rangeCheckButton = document.createElement('button');
+    rangeCheckButton.textContent = 'rangeChack';
+    rangeCheckButton.onclick = rangeCheck;
+    buttonContainer.appendChild(rangeCheckButton);
+}
+
+createRangeCheckButton();
+createSizePatternTestButton();
+createExactSizePatternTestButton();
+createRealSizePatternTestButton();
+createCaptureTypeTestButton();
+createConstraintsTestButton();
+createScreenCaptureAPITestButton();
+createChromeScreenCaptureTestButton();
+createFirefoxScreenCaptureTestButton();
+
 
 
 function createStream({
