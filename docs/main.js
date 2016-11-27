@@ -45,25 +45,29 @@ var constraintsPatterns = [
     null,
     { audio: false, video: true },
     { audio: true, video: true },
-    {
-        video: {
-            width: 320,
-            height: 240,
-            aspectRatio: 16 / 9,
-            frameRate: 15,
-            facingMode: 'user'
-        },
-        audio: {
-            volume: 0.3,
-            sampleRate: 1120,
-            sampleSize: 8,
-            echoCancellation: true,
-            latency: 0,
-            channelCount: 1
-        },
-        deviceId: null,
-        groupId: null
-    }
+    { frameRate: 1 },
+    { captureType: 'camera', frameRate: 1 },
+    // {
+    //     video: {
+    //         width: 320,
+    //         height: 240,
+    //         aspectRatio: 16 / 9,
+    //         frameRate: 15,
+    //         facingMode: 'user',
+    //         deviceId: null,
+    //         groupId: null
+    //     },
+    //     audio: {
+    //         volume: 0.3,
+    //         sampleRate: 1120,
+    //         sampleSize: 8,
+    //         echoCancellation: true,
+    //         latency: 0,
+    //         channelCount: 1,
+    //         deviceId: null,
+    //         groupId: null
+    //     }
+    // }
 ]
 
 var dummyPatterns = [
@@ -143,18 +147,48 @@ function createSizePatternTestButton() {
         for (let j = 100; j < 3500; j += 100) {
             let width = i === 1 ? 100 : j;
             let height = i === 2 ? 100 : j;
-            let [expectWidth, expectHeight] = GetBestFitnessDistance(logicoolSize, {width, height});
+            let [expectWidth, expectHeight] = GetBestFitnessDistance(logicoolSize, { width, height });
             let btn = createTestButton(`${width}x${height} (${expectWidth}x${expectHeight})`, sizePatternButtonOnClick);
             buttonContainer.appendChild(btn);
         }
     }
 }
 
+function createExactSizePatternTestButton() {
+    let buttonContainer = createButtonContainer(`カメラサイズ (exact)`);
+    for (let j = 100; j < 3500; j += 100) {
+        let btn = createTestButton(`${j}x${j}`, function () {
+            preview.srcObject = createStream({
+                captureType: 'camera',
+                video: {
+                    width: j,
+                    height: j
+                }
+            }).then(stream => {
+                errorMessage.textContent = '';
+                preview.srcObject = stream;
+            }).catch(err => {
+                previewSize.textContent = '';
+                errorMessage.textContent = err.name + ': ' + err.message;
+            });
+        });
+        buttonContainer.appendChild(btn);
+    }
+}
+
 function createScreenCaptureAPITestButton() {
     let buttonContainer = createButtonContainer('Screen Capture API 向けテスト');
     screenCaptureAPIPatterns.forEach(pattern => {
-        let btn = createTestButton(pattern, function() {
-            createStream({ captureType: this.textContent });
+        let btn = createTestButton(pattern, function () {
+            preview.srcObject = createStream({
+                captureType: this.textContent
+            }).then(stream => {
+                errorMessage.textContent = '';
+                preview.srcObject = stream;
+            }).catch(err => {
+                previewSize.textContent = '';
+                errorMessage.textContent = err.name + ': ' + err.message;
+            });
         });
         buttonContainer.appendChild(btn);
     });
@@ -163,8 +197,16 @@ function createScreenCaptureAPITestButton() {
 function createChromeScreenCaptureTestButton() {
     let buttonContainer = createButtonContainer('Chrome向けスクリーンキャプチャテスト');
     chromeScreenCapturePatterns.forEach(pattern => {
-        let btn = createTestButton(pattern, function() {
-            createStream({ captureType: this.textContent });
+        let btn = createTestButton(pattern, function () {
+            preview.srcObject = createStream({
+                captureType: this.textContent
+            }).then(stream => {
+                errorMessage.textContent = '';
+                preview.srcObject = stream;
+            }).catch(err => {
+                previewSize.textContent = '';
+                errorMessage.textContent = err.name + ': ' + err.message;
+            });
         });
         buttonContainer.appendChild(btn);
     });
@@ -173,8 +215,16 @@ function createChromeScreenCaptureTestButton() {
 function createFirefoxScreenCaptureTestButton() {
     let buttonContainer = createButtonContainer('Firefox向けスクリーンキャプチャテスト');
     firefoxScreenCapturePatterns.forEach(pattern => {
-        let btn = createTestButton(pattern, function() {
-            createStream({ captureType: this.textContent });
+        let btn = createTestButton(pattern, function () {
+            preview.srcObject = createStream({
+                captureType: this.textContent
+            }).then(stream => {
+                errorMessage.textContent = '';
+                preview.srcObject = stream;
+            }).catch(err => {
+                previewSize.textContent = '';
+                errorMessage.textContent = err.name + ': ' + err.message;
+            });
         });
         buttonContainer.appendChild(btn);
     });
@@ -182,8 +232,19 @@ function createFirefoxScreenCaptureTestButton() {
 
 function createRealSizePatternTestButton() {
     let buttonContainer = createButtonContainer('実サイズ');
-    logicoolSize.forEach(([width, height]) => {
-        let btn = createTestButton(`${width}x${height}`);
+    logicoolSize.forEach(({width, height}) => {
+        let btn = createTestButton(`${width}x${height}`, function () {
+            preview.srcObject = createStream({
+                captureType: 'camera',
+                video: { width, height }
+            }).then(stream => {
+                errorMessage.textContent = '';
+                preview.srcObject = stream;
+            }).catch(err => {
+                previewSize.textContent = '';
+                errorMessage.textContent = err.name + ': ' + err.message;
+            });
+        });
         buttonContainer.appendChild(btn);
     });
 }
@@ -191,12 +252,33 @@ function createRealSizePatternTestButton() {
 function createCaptureTypeTestButton() {
     let buttonContainer = createButtonContainer('ダミーパターン (画像とWeb Audio APIからストリームを生成)');
     dummyPatterns.forEach(val => {
-        let btn = createTestButton([].concat(val).join('-').toString(), function() {
-            createStream({ captureType: this.textContent === 'dummy' ? null : this.textContent })
-                .then(_ => errorMessage.textContent = '')
-                .catch(err => {
-                    errorMessage.textContent = (err);
-                });
+        let btn = createTestButton([].concat(val).join('-').toString(), function () {
+            preview.srcObject = createStream({
+                captureType: this.textContent === 'dummy' ? null : this.textContent
+            }).then(stream => {
+                errorMessage.textContent = '';
+                preview.srcObject = stream;
+            }).catch(err => {
+                previewSize.textContent = '';
+                errorMessage.textContent = err.name + ': ' + err.message;
+            });
+        });
+        btn.classList.add('captype');
+        buttonContainer.appendChild(btn);
+    });
+}
+
+function createConstraintsTestButton() {
+    let buttonContainer = createButtonContainer('constraints パターン');
+    constraintsPatterns.forEach(val => {
+        let btn = createTestButton(JSON.stringify(val), function () {
+            createStream(val).then(stream => {
+                errorMessage.textContent = '';
+                preview.srcObject = stream;
+            }).catch(err => {
+                previewSize.textContent = '';
+                errorMessage.textContent = err.name + ': ' + err.message;
+            });
         });
         btn.classList.add('captype');
         buttonContainer.appendChild(btn);
@@ -207,17 +289,81 @@ function sizePatternButtonOnClick() {
     var size = this.textContent.split(' ')[0].split('x');
     var width = +size[0];
     var height = +size[1];
-    createStream({ captureType: 'camera', width, height }).catch(err => {
-        console.log(err);
+    createStream({
+        captureType: 'camera',
+        width, height
+    }).then(stream => {
+        errorMessage.textContent = '';
+        preview.srcObject = stream;
+    }).catch(err => {
+        previewSize.textContent = '';
+        errorMessage.textContent = err.name + ': ' + err.message;
     });
 }
 
 createSizePatternTestButton();
-//createRealSizePatternTestButton();
+createExactSizePatternTestButton();
+createRealSizePatternTestButton();
 createCaptureTypeTestButton();
+createConstraintsTestButton();
 createScreenCaptureAPITestButton();
 createChromeScreenCaptureTestButton();
 createFirefoxScreenCaptureTestButton();
+
+function rangeCheck(trackName, propertyName, subPropertyName, val, half, type, prevState) {
+    var constraints = {
+        [trackName]: {
+            [propertyName]: {
+                [subPropertyName]: type === 'int' ? ~~val : val
+            }
+        }
+    };
+    return navigator.mediaDevices.getUserMedia(constraints).then(stream => {
+        stream.getTracks().forEach(track => track.stop());
+        if (prevState === 'fail') {
+            if (type === 'int' && half < 1) {
+                return Math.floor(val);
+            } else if (type === 'float' && half < 0.00000000001) {
+                return val;
+            }
+        }
+        if (subPropertyName === 'min') {
+            val = val + half;
+            console.log('success', val, half);
+            return rangeCheck(trackName, propertyName, subPropertyName, val, half / 2, type, 'success');
+        } else {
+            val = val - half;
+            console.log('success', val, half);
+            return rangeCheck(trackName, propertyName, subPropertyName, val, half / 2, type, 'success');
+        }
+    }).catch(err => {
+        console.log(err.name);
+        if (subPropertyName === 'min') {
+            val = val - half;
+            console.log('fail', val, half);
+            return rangeCheck(trackName, propertyName, subPropertyName, val, half / 2, type, 'fail');
+        } else {
+            val = val + half;
+            console.log('fail', val, half);
+            return rangeCheck(trackName, propertyName, subPropertyName, val, half / 2, type, 'fail');
+        }
+    });
+}
+var constraintableRange = {
+    width: { min: 10000, max: 0 },
+    height: { min: 10000, max: 0 },
+    frameRate: { min: 500, max: 0 },
+    aspectRatio: { min: 100, max: 0 },
+}
+Promise.all([
+rangeCheck('video', 'width', 'min', 10000000, 10000000/2, 'int'),
+rangeCheck('video', 'height', 'min', 10000000, 10000000/2, 'int'),
+rangeCheck('video', 'width', 'max', 0, 10000000/2, 'int'),
+rangeCheck('video', 'height', 'max', 0, 10000000/2, 'int')
+]).then(([minWidth, minHeight, maxWidth, maxHeight]) => {
+    console.log(minWidth, maxWidth, minHeight, maxHeight);
+})
+
 
 function createStream({
     url = null,
@@ -227,7 +373,8 @@ function createStream({
     height = 180,
     audio = false,
     video = true,
-    constraints = null
+    constraints = null,
+    frameRate = undefined
 } = {}) {
     // -------------------------------------------------
     // テスト用コード
@@ -310,23 +457,38 @@ function createStream({
                 if (browserType === 'Chrome' && !Array.isArray(captureType)) {
                     var vc = constraints.video;
                     constraints.video = {
-                        optional: [
-                            { minWidth: vc.width },
-                            { maxWidth: vc.width },
-                            { minHeight: vc.height },
-                            { maxHeight: vc.height }
-                        ]
+                        mandatory: {
+                            minWidth: vc.width,
+                            maxWidth: vc.width,
+                            minHeight: vc.height,
+                            maxHeight: vc.height
+                        }
                     }
+                    //constraints.video.mandatory.sourceId = 'c28afefcbfa5eff956ca96a9e990c2e098ecafd846b2e734c4fa488be25a5704';
                 }
+                //if(frameRate) constraints.video.frameRate = 30;
+                //console.log(JSON.stringify(constraints, null, 4));
+                constraints = {
+                    video: {
+                        width: { min: 2000 },
+                        height: 100,
+                        frameRate: { min: 30 }
+                    },
+                }
+                console.log(JSON.stringify(constraints, null, 4));
                 return navigator.mediaDevices[captureMethod](constraints)
-                    .then(stream => ({ stream }));
-            });
+                    .then(stream => ({ stream }))
+            })
         }
     } else {
         proc = Promise.resolve();
     }
     return proc.then(({stream = null, file = null} = {}) => {
-        if (stream) return { stream };
+        if (stream) {
+            return { stream };
+        } else if (captureType === 'camera') {
+            return Promise.reject({ name: 'ConstraintNotSatisfiedError2', message: '' });
+        }
         return new Promise((resolve, reject) => {
             if (file) {
                 var media = document.createElement('video');
@@ -380,13 +542,13 @@ function createStream({
             cnv.width = width;
             cnv.height = height;
             let ctx = cnv.getContext('2d');
-            ctx.font = '44px arial';
+            ctx.font = '22px arial';
             ctx.strokStyle = 'black';
             ctx.lineWidth = 2;
             ctx.fillStyle = 'white';
             ctx.textAlign = 'right';
             let ratio = Math.min(cnv.width / mediaWidth, cnv.height / mediaHeight);
-            let tracks = [cnv.captureStream().getVideoTracks()[0]];
+            let tracks = [cnv.captureStream(frameRate).getVideoTracks()[0]];
             if (audioTrack) tracks.push(audioTrack);
             stream = new MediaStream(tracks);
             streams[myId][stream.id] = {
@@ -407,7 +569,7 @@ function createStream({
         } else {
             streams[myId][stream.id] = { stream };
         }
-        preview.srcObject = stream;
+        return stream;
     });
 }
 
@@ -421,7 +583,7 @@ function renderDummyVideoTrack() {
         ctx.drawImage(media, left, top, width, height);
         if (time) {
             var dt = new Date();
-            var dtStr = [dt.getHours(), dt.getMinutes(), dt.getSeconds()].map(v => ('0' + v).slice(-2)).join(':');
+            var dtStr = [dt.getHours(), dt.getMinutes(), dt.getSeconds(), dt.getMilliseconds()].map(v => ('0' + v).slice(-2)).join(':');
             ctx.strokeText(dtStr, cnv.width - left - 1, cnv.height - top - 1);
             ctx.fillText(dtStr, cnv.width - left - 3, cnv.height - top - 3);
         }
@@ -541,7 +703,7 @@ function GetBestFitnessDistance(candidateSet, constraints) {
     var first = true;
     for (var i = 0, l = candidateSet.length; i < l; i++) {
         candidateSet[i].distance = GetFitnessDistance(candidateSet[i], constraints);
-        console.log('distance', candidateSet[i].width + 'x' + candidateSet[i].height, constraints.width + 'x' + constraints.height, candidateSet[i].distance);
+        //console.log('distance', candidateSet[i].width + 'x' + candidateSet[i].height, constraints.width + 'x' + constraints.height, candidateSet[i].distance);
     }
     var bestCandidate = TrimLessFitCandidates(candidateSet);
     return [bestCandidate.width, bestCandidate.height];
