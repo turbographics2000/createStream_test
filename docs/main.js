@@ -354,7 +354,9 @@ function rangeCheck() {
         rangeCheckProc('video', 'height', 'max', 0, 10000000 / 2, 'int')
     ]).then(([minWidth, minHeight, maxWidth, maxHeight]) => {
         console.log(minWidth, maxWidth, minHeight, maxHeight);
-    });
+    }).catch(err => {
+        console.log(err);
+    })
 }
 
 function createRangeCheckButton() {
