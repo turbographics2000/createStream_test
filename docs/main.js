@@ -370,6 +370,14 @@ function rangeCheck() {
     }).then(val => {
         constraintableRange.height.max = val;
     }).then(_ => {
+        return rangeCheckProc('video', 'frameRate', 'min', 100000, 100000 / 2, 'int');
+    }).then(val => {
+        constraintableRange.frameRate.min = val;
+    }).then(_ => {
+        return rangeCheckProc('video', 'frameRate', 'max', 0, 100000 / 2, 'int');
+    }).then(val => {
+        constraintableRange.frameRate.max = val;
+    }).then(_ => {
         previewSize.innerHTML = JSON.stringify(constraintableRange, null, 2).replace(/\n/g, '<br>');
     });
     // Promise.all([
