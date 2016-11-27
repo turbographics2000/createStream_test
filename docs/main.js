@@ -347,16 +347,24 @@ var constraintableRange = {
     aspectRatio: { min: 100, max: 0 },
 }
 function rangeCheck() {
-    Promise.all([
-        rangeCheckProc('video', 'width', 'min', 10000000, 10000000 / 2, 'int'),
-        rangeCheckProc('video', 'height', 'min', 10000000, 10000000 / 2, 'int'),
-        rangeCheckProc('video', 'width', 'max', 0, 10000000 / 2, 'int'),
-        rangeCheckProc('video', 'height', 'max', 0, 10000000 / 2, 'int')
-    ]).then(([minWidth, minHeight, maxWidth, maxHeight]) => {
-        console.log(minWidth, maxWidth, minHeight, maxHeight);
-    }).catch(err => {
-        console.log(err);
-    })
+    rangeCheckProc('video', 'width', 'min', 10000000, 10000000 / 2, 'int').then(val => {
+        constraintableRange.width.min = val;
+    }).then(_ => {
+        return rangeCheckProc('video', 'height', 'min', 10000000, 10000000 / 2, 'int');
+    }).then(val => {
+        constraintableRange.height.min = val;
+    }).then(_ => {
+        return rangeCheckProc('video', 'width', 'max', 0, 10000000 / 2, 'int');
+    }).then(val => {
+        constraintableRange.width.max = val;
+    }).then(_ => {
+        return rangeCheckProc('video', 'height', 'max', 0, 10000000 / 2, 'int');
+    }).then(val => {
+        constraintableRange.height.max = val;
+        return constraintableRange;
+    }).then(val => {
+        console.log(JSON.stringify(val, null, 4));
+    });
 }
 
 function createRangeCheckButton() {
