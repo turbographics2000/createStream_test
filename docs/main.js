@@ -304,13 +304,14 @@ function sizePatternButtonOnClick() {
 function rangeCheckProc(...args) {
     return new Promise((resolve, reject) => {
         function loop(trackName, propertyName, subPropertyName, val, half, type, prevState) {
-            var constraints = {
+            let constraints = {
                 [trackName]: {
                     [propertyName]: {
                         [subPropertyName]: type === 'int' ? ~~val : val
                     }
                 }
             };
+            console.log('getUserMedia', JSON.stringify(constraints, null, 2));
             navigator.mediaDevices.getUserMedia(constraints).then(stream => {
                 stream.getTracks().forEach(track => track.stop());
                 if (prevState === 'fail') {
