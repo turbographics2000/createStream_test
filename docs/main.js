@@ -316,8 +316,10 @@ function rangeCheckProc(...args) {
                 if (prevState === 'fail') {
                     if (type === 'int' && half < 1) {
                         resolve(Math.floor(val));
+                        return;
                     } else if (type === 'float' && half < 0.00000000001) {
                         resolve(val);
+                        return;
                     }
                 }
                 if (subPropertyName === 'min') {
