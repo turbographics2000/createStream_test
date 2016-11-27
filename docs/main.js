@@ -354,7 +354,7 @@ var constraintableRange = {
     aspectRatio: { min: 100, max: 0 },
 }
 function rangeCheck() {
-    rangeCheckProc('video', 'width', 'min', 100000, 100000 / 2, 'int').then(val => console.log(val));
+    rangeCheckProc('video', 'width', 'min', 100000, 100000 / 2, 'int').then(val => previewSize.textContent = val);
     //     constraintableRange.width.min = val;
     // }).then(_ => {
     //     return rangeCheckProc('video', 'height', 'min', 100000, 100000 / 2, 'int');
