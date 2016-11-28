@@ -359,16 +359,18 @@ function rangeCheck() {
     loopCnt = 0;
     rangeCheckProc('video', 'width', 'min', 10000, 10000 / 2, 'int').then(val => {
         constraintableRange.width.min = val;
-    }).then(_ => {
-        return rangeCheckProc('video', 'width', 'max', 0, 10000 / 2, 'int');
+        return val
+    }).then(val => {
+        return rangeCheckProc('video', 'width', 'max', val, 10000 / 2, 'int');
     }).then(val => {
         constraintableRange.width.max = val;
     }).then(_ => {
         return rangeCheckProc('video', 'height', 'min', 10000, 10000 / 2, 'int');
     }).then(val => {
         constraintableRange.height.min = val;
-    }).then(_ => {
-        return rangeCheckProc('video', 'height', 'max', 0, 10000 / 2, 'int');
+        return val
+    }).then(val => {
+        return rangeCheckProc('video', 'height', 'max', val, 10000 / 2, 'int');
     }).then(val => {
         constraintableRange.height.max = val;
     }).then(_ => {
