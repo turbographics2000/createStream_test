@@ -301,9 +301,11 @@ function sizePatternButtonOnClick() {
     });
 }
 
+var loopCnt = 0;
 function rangeCheckProc(...args) {
     return new Promise((resolve, reject) => {
         function loop(trackName, propertyName, subPropertyName, val, half, type, prevState) {
+            loopCnt++;
             let constraints = {
                 [trackName]: {
                     [propertyName]: {
@@ -351,10 +353,10 @@ function rangeCheckProc(...args) {
 var constraintableRange = {
     width: { min: 10000, max: 0 },
     height: { min: 10000, max: 0 },
-    frameRate: { min: 500, max: 0 },
-    aspectRatio: { min: 100, max: 0 },
+    frameRate: { min: 500, max: 0 }
 }
 function rangeCheck() {
+    loopCnt = 0;
     rangeCheckProc('video', 'width', 'min', 100000, 100000 / 2, 'int').then(val => {
         constraintableRange.width.min = val;
     }).then(_ => {
@@ -378,6 +380,7 @@ function rangeCheck() {
     }).then(val => {
         constraintableRange.frameRate.max = val;
     }).then(_ => {
+        constraintableRange.loopCnt = loopCnt;
         previewSize.innerHTML = JSON.stringify(constraintableRange, null, 2).replace(/\n/g, '<br>');
     });
     // Promise.all([
