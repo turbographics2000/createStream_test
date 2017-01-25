@@ -1,9 +1,9 @@
 var extensionId = 'ophefhhmblpnpplgcaeihbobllolhpnl';
 var browserType = window.chrome ? 'Chrome' :
     window.StyleMedia ? 'Edge' :
-        window.InstallTrigger ? 'Firefox' :
-            window.safari ? 'Safari' :
-                'Unsupported Browser';
+    window.InstallTrigger ? 'Firefox' :
+    window.safari ? 'Safari' :
+    'Unsupported Browser';
 var myId = 'cat';
 let audioContext = new AudioContext();
 var renderStreamId = null;
@@ -104,11 +104,14 @@ function chromeExtSend(msg) {
     });
 }
 
-document.body.ondragover = function (evt) {
+document.body.ondragover = function(evt) {
     evt.preventDefault();
+    if (evt.dataTransfer.files) {
+
+    }
 };
 
-document.body.ondrop = function (evt) {
+document.body.ondrop = function(evt) {
     var video = document.createElement('video');
     evt.preventDefault();
     let files = Array.from(evt.dataTransfer.files);
@@ -157,7 +160,7 @@ function createSizePatternTestButton() {
 function createExactSizePatternTestButton() {
     let buttonContainer = createButtonContainer(`カメラサイズ (exact)`);
     for (let j = 100; j < 3500; j += 100) {
-        let btn = createTestButton(`${j}x${j}`, function () {
+        let btn = createTestButton(`${j}x${j}`, function() {
             preview.srcObject = createStream({
                 captureType: 'camera',
                 video: {
@@ -179,7 +182,7 @@ function createExactSizePatternTestButton() {
 function createScreenCaptureAPITestButton() {
     let buttonContainer = createButtonContainer('Screen Capture API 向けテスト');
     screenCaptureAPIPatterns.forEach(pattern => {
-        let btn = createTestButton(pattern, function () {
+        let btn = createTestButton(pattern, function() {
             preview.srcObject = createStream({
                 captureType: this.textContent
             }).then(stream => {
@@ -197,7 +200,7 @@ function createScreenCaptureAPITestButton() {
 function createChromeScreenCaptureTestButton() {
     let buttonContainer = createButtonContainer('Chrome向けスクリーンキャプチャテスト');
     chromeScreenCapturePatterns.forEach(pattern => {
-        let btn = createTestButton(pattern, function () {
+        let btn = createTestButton(pattern, function() {
             preview.srcObject = createStream({
                 captureType: this.textContent
             }).then(stream => {
@@ -215,7 +218,7 @@ function createChromeScreenCaptureTestButton() {
 function createFirefoxScreenCaptureTestButton() {
     let buttonContainer = createButtonContainer('Firefox向けスクリーンキャプチャテスト');
     firefoxScreenCapturePatterns.forEach(pattern => {
-        let btn = createTestButton(pattern, function () {
+        let btn = createTestButton(pattern, function() {
             preview.srcObject = createStream({
                 captureType: this.textContent
             }).then(stream => {
@@ -232,8 +235,8 @@ function createFirefoxScreenCaptureTestButton() {
 
 function createRealSizePatternTestButton() {
     let buttonContainer = createButtonContainer('実サイズ');
-    logicoolSize.forEach(({width, height}) => {
-        let btn = createTestButton(`${width}x${height}`, function () {
+    logicoolSize.forEach(({ width, height }) => {
+        let btn = createTestButton(`${width}x${height}`, function() {
             preview.srcObject = createStream({
                 captureType: 'camera',
                 video: { width, height }
@@ -252,7 +255,7 @@ function createRealSizePatternTestButton() {
 function createCaptureTypeTestButton() {
     let buttonContainer = createButtonContainer('ダミーパターン (画像とWeb Audio APIからストリームを生成)');
     dummyPatterns.forEach(val => {
-        let btn = createTestButton([].concat(val).join('-').toString(), function () {
+        let btn = createTestButton([].concat(val).join('-').toString(), function() {
             preview.srcObject = createStream({
                 captureType: this.textContent === 'dummy' ? null : this.textContent
             }).then(stream => {
@@ -271,7 +274,7 @@ function createCaptureTypeTestButton() {
 function createConstraintsTestButton() {
     let buttonContainer = createButtonContainer('constraints パターン');
     constraintsPatterns.forEach(val => {
-        let btn = createTestButton(JSON.stringify(val), function () {
+        let btn = createTestButton(JSON.stringify(val), function() {
             createStream(val).then(stream => {
                 errorMessage.textContent = '';
                 preview.srcObject = stream;
@@ -291,7 +294,8 @@ function sizePatternButtonOnClick() {
     var height = +size[1];
     createStream({
         captureType: 'camera',
-        width, height
+        width,
+        height
     }).then(stream => {
         errorMessage.textContent = '';
         preview.srcObject = stream;
@@ -302,6 +306,7 @@ function sizePatternButtonOnClick() {
 }
 
 var loopCnt = 0;
+
 function rangeCheckProc(...args) {
     return new Promise((resolve, reject) => {
         function loop(trackName, propertyName, subPropertyName, val, half, type, prevState) {
@@ -355,22 +360,21 @@ var constraintableRange = {
     height: { min: 10000, max: 0 },
     frameRate: { min: 500, max: 0 }
 }
+
 function rangeCheck() {
     loopCnt = 0;
     rangeCheckProc('video', 'width', 'min', 10000, 10000 / 2, 'int').then(val => {
         constraintableRange.width.min = val;
-        return val
-    }).then(val => {
-        return rangeCheckProc('video', 'width', 'max', val, 10000 / 2, 'int');
+    }).then(_ => {
+        return rangeCheckProc('video', 'width', 'max', 0, 10000 / 2, 'int');
     }).then(val => {
         constraintableRange.width.max = val;
     }).then(_ => {
         return rangeCheckProc('video', 'height', 'min', 10000, 10000 / 2, 'int');
     }).then(val => {
         constraintableRange.height.min = val;
-        return val
-    }).then(val => {
-        return rangeCheckProc('video', 'height', 'max', val, 10000 / 2, 'int');
+    }).then(_ => {
+        return rangeCheckProc('video', 'height', 'max', 0, 10000 / 2, 'int');
     }).then(val => {
         constraintableRange.height.max = val;
     }).then(_ => {
@@ -438,13 +442,10 @@ createFirefoxScreenCaptureTestButton();
 
 
 function createStream({
-    url = null,
-    file = null,
-    captureType = null,
-    width = 240,
-    height = 180,
     audio = false,
     video = true,
+    width = 240,
+    height = 180,
     constraints = null,
     frameRate = undefined
 } = {}) {
@@ -463,20 +464,46 @@ function createStream({
     streams[myId] = {};
     // -------------------------------------------------
 
-
+    var ps = [];
+    var typeCheck = (val, kind) => {
+        var p = false;
+        if (typeof val === 'string') {
+            if (['application', 'browser', 'monitor', 'window', 'screen', 'tab'].includes(val)) {
+                p = Promise.resolve(val);
+            } else {
+                let url = new URL(val, location.origin + location.pathname);
+                if (kind === 'audio')
+                    p = fetch(url).then(res => res.arrayBuffer()).then(buffer => ({ buffer: buffer }));
+            }
+        } else if (val.constructor && val.constructor.name && val.constructor.name === 'File') {
+            p = Promise.resolve({ file: val });
+        } else if (typeof val === 'boolean' || typeof val === 'object') {
+            p = Promise.resolve(val);
+        } else if (!val) {
+            p = Promise.resolve(false);
+        }
+        ps.push(p);
+    }
+    typeCheck(audio, 'audio');
+    typeCheck(video, 'video');
     var proc = null;
-    if (url) {
-        if (typeof url !== 'string') {
-            return Promise.reject('createStream TypeError: url is not a string.');
-        }
-        proc = fetch(url).then(response => response.blob()).then(file => ({ file }));
-    } else if (file) {
-        if (!file.constructor || file.constructor.name !== 'File') {
-            return Promise.reject('createStream TypeError: file is not a File.');
-        }
-        proc = Promise.resolve({ file });
-    } else if (captureType) {
-        if (typeof captureType !== 'string' && !(Array.isArray(captureType) && captureType.every(val => typeof val === 'string'))) {
+    if (ps.length) {
+        proc = Promise.all(ps);
+    } else {
+        return Promise.reject('require audio / video member.');
+    }
+    proc.then(([audio, video]) => {
+        if ()
+            if (audio.constructor && audio.constructor.name && audio.constructor.name === 'File') {
+                let src = audioContext.decodeAudioData()
+            } else if (audio)
+
+
+    })
+    if (captureType) {
+        if (typeof captureType !== 'string' &&
+            !(Array.isArray(captureType) &&
+                captureType.every(val => typeof val === 'string'))) {
             return Promise.reject('createStream TypeError: captureType is not a string or string array.');
         }
         if (captureType.includes('-')) captureType = captureType.split('-');
@@ -529,24 +556,17 @@ function createStream({
                 if (browserType === 'Chrome' && !Array.isArray(captureType)) {
                     var vc = constraints.video;
                     constraints.video = {
-                        mandatory: {
-                            minWidth: vc.width,
-                            maxWidth: vc.width,
-                            minHeight: vc.height,
-                            maxHeight: vc.height
+                            mandatory: {
+                                minWidth: vc.width,
+                                maxWidth: vc.width,
+                                minHeight: vc.height,
+                                maxHeight: vc.height
+                            }
                         }
-                    }
-                    //constraints.video.mandatory.sourceId = 'c28afefcbfa5eff956ca96a9e990c2e098ecafd846b2e734c4fa488be25a5704';
+                        //constraints.video.mandatory.sourceId = 'c28afefcbfa5eff956ca96a9e990c2e098ecafd846b2e734c4fa488be25a5704';
                 }
                 //if(frameRate) constraints.video.frameRate = 30;
                 //console.log(JSON.stringify(constraints, null, 4));
-                constraints = {
-                    video: {
-                        width: { min: 2000 },
-                        height: 100,
-                        frameRate: { min: 30 }
-                    },
-                }
                 console.log(JSON.stringify(constraints, null, 4));
                 return navigator.mediaDevices[captureMethod](constraints)
                     .then(stream => ({ stream }))
@@ -555,55 +575,79 @@ function createStream({
     } else {
         proc = Promise.resolve();
     }
-    return proc.then(({stream = null, file = null} = {}) => {
+    return proc.then(({ stream = null, audioFile = null, videoFile = null } = {}) => {
         if (stream) {
             return { stream };
         } else if (captureType === 'camera') {
             return Promise.reject({ name: 'ConstraintNotSatisfiedError2', message: '' });
         }
         return new Promise((resolve, reject) => {
-            if (file) {
-                var media = document.createElement('video');
-                if (!media.canPlayType(file.type)) {
-                    throw { name: 'createStream', message: file.type + ' is not supported.' };
-                }
-                var mediaURL = URL.createObjectURL(file);
-                media.onloadedmetadata = function () {
-                    var ret = {};
-                    if (this.captureStream) {
-                        this.play();
-                        ret.stream = this.captureStream();
-                    } else {
-                        if (media.audioTracks.length) {
-                            var src = audioContext.createMediaElementSource(media);
-                            var dst = src.connect(audioContext.createMediaStreamDestination());
-                            ret.audioTrack = dst.stream.getAudioTracks()[0];
+            if (audioFile || videoFile) {
+                var stream = new MediaStream();
+                var ret = {};
+                var audioTrackFromAudioFile = function() {
+                    return new Promise((resolve, reject) => {
+                        var audio = new Audio();
+                        if (!audio.canPlayType(audioFile.type)) {
+                            throw { name: 'createStream', message: videoFile.type + ' is not supported.' };
                         }
-                        if (options.file) ret.mediaURL = this.src;
-                        ret.media = this;
-                        ret.renderCanvas = !!media.videoWidth;
-                    }
-                    resolve(ret);
+                        audio.onloadedmetadata = function() {
+                            if (this.captureStream) {
+                                this.play();
+                                var audioStream = this.captureStream();
+                                var audioTracks = audioStream.getAudioTracks();
+                                audioTracks.forEach(track => {
+                                    audioStream.removeTrack(track);
+                                    stream.addTrack(audioTracks);
+                                });
+                            }
+                        }
+                        audio.src = URL.createObjectURL(audioFile);
+                    });
                 }
-                media.src = mediaURL;
+                if (audioFile) {}
+                if (videoFile) {
+                    var video = document.createElement('video');
+                    if (!video.canPlayType(videoFile.type)) {
+                        throw { name: 'createStream', message: videoFile.type + ' is not supported.' };
+                    }
+                    video.onloadedmetadata = function() {
+                        var ret = {};
+                        if (this.captureStream) {
+                            this.play();
+                            stream = this.captureStream(frameRate);
+                        } else {
+                            if (videoFile.audioTracks.length) {
+                                var src = audioContext.createMediaElementSource(videoFile);
+                                var dst = src.connect(audioContext.createMediaStreamDestination());
+                                ret.audioTrack = dst.stream.getAudioTracks()[0];
+                            }
+                            ret.videoURL = this.src;
+                            ret.video = this;
+                            ret.renderCanvas = !!video.videoWidth;
+                        }
+                        resolve(ret);
+                    }
+                    video.src = URL.createObjectURL(videoFile);
+                }
             } else {
-                var media = new Image();
-                media.onload = function (evt) {
+                var img = new Image();
+                img.onload = function(evt) {
                     let oscillator = audioContext.createOscillator();
                     let dst = oscillator.connect(audioContext.createMediaStreamDestination());
                     oscillator.start();
                     var audioTrack = dst.stream.getAudioTracks()[0];
                     audioTrack.enabled = false;
                     resolve({
-                        media: this,
+                        video: this,
                         renderCanvas: true,
                         audioTrack
                     });
                 };
-                media.src = `./${myId}/${0}.jpg`;
+                img.src = `./${myId}/${0}.jpg`;
             }
         });
-    }).then(({stream, media, mediaURL, renderCanvas, audioTrack}) => {
+    }).then(({ stream, video, videoURL, renderCanvas, audioTrack }) => {
         if (renderCanvas) {
             let mediaWidth = media.naturalWidth || media.videoWidth;
             let mediaHeight = media.naturalHeight || media.videoHeight;
@@ -626,8 +670,8 @@ function createStream({
             streams[myId][stream.id] = {
                 cnv,
                 ctx,
-                media,
-                mediaURL,
+                video,
+                videoURL,
                 left: (cnv.width - (mediaWidth * ratio)) / 2,
                 top: (cnv.height - (mediaHeight * ratio)) / 2,
                 width: mediaWidth * ratio,
@@ -650,9 +694,9 @@ function renderDummyVideoTrack() {
     var localStreams = streams[myId];
     var keys = Object.keys(localStreams);
     for (var i = keys.length; i--;) {
-        var {cnv, ctx, media, left, top, width, height, time = false} = localStreams[keys[i]];
+        var { cnv, ctx, video, left, top, width, height, time = false } = localStreams[keys[i]];
         ctx.clearRect(0, 0, cnv.width, cnv.height);
-        ctx.drawImage(media, left, top, width, height);
+        ctx.drawImage(video, left, top, width, height);
         if (time) {
             var dt = new Date();
             var dtStr = [dt.getHours(), dt.getMinutes(), dt.getSeconds(), dt.getMilliseconds()].map(v => ('0' + v).slice(-2)).join(':');
@@ -662,17 +706,17 @@ function renderDummyVideoTrack() {
     };
 }
 
-preview.onloadedmetadata = function () {
+preview.onloadedmetadata = function() {
     previewSize.textContent = preview.videoWidth + "x" + preview.videoHeight;
 }
 
 
-var constraintsToChrome_ = function (c) {
+var constraintsToChrome_ = function(c) {
     if (typeof c !== 'object' || c.mandatory || c.optional) {
         return c;
     }
     var cc = {};
-    Object.keys(c).forEach(function (key) {
+    Object.keys(c).forEach(function(key) {
         if (key === 'require' || key === 'advanced' || key === 'mediaSource') {
             return;
         }
@@ -680,7 +724,7 @@ var constraintsToChrome_ = function (c) {
         if (r.exact !== undefined && typeof r.exact === 'number') {
             r.min = r.max = r.exact;
         }
-        var oldname_ = function (prefix, name) {
+        var oldname_ = function(prefix, name) {
             if (prefix) {
                 return prefix + name.charAt(0).toUpperCase() + name.slice(1);
             }
@@ -704,7 +748,7 @@ var constraintsToChrome_ = function (c) {
             cc.mandatory = cc.mandatory || {};
             cc.mandatory[oldname_('', key)] = r.exact;
         } else {
-            ['min', 'max'].forEach(function (mix) {
+            ['min', 'max'].forEach(function(mix) {
                 if (r[mix] !== undefined) {
                     cc.mandatory = cc.mandatory || {};
                     cc.mandatory[oldname_(mix, key)] = r[mix];
@@ -718,7 +762,7 @@ var constraintsToChrome_ = function (c) {
     return cc;
 };
 
-var shimConstraints_ = function (constraints, func) {
+var shimConstraints_ = function(constraints, func) {
     constraints = JSON.parse(JSON.stringify(constraints));
     if (constraints && constraints.audio) {
         constraints.audio = constraintsToChrome_(constraints.audio);
@@ -729,23 +773,22 @@ var shimConstraints_ = function (constraints, func) {
         face = face && ((typeof face === 'object') ? face : { ideal: face });
 
         if ((face && (face.exact === 'user' || face.exact === 'environment' ||
-            face.ideal === 'user' || face.ideal === 'environment')) &&
+                face.ideal === 'user' || face.ideal === 'environment')) &&
             !(navigator.mediaDevices.getSupportedConstraints &&
                 navigator.mediaDevices.getSupportedConstraints().facingMode)) {
             delete constraints.video.facingMode;
             if (face.exact === 'environment' || face.ideal === 'environment') {
                 // Look for "back" in label, or use last cam (typically back cam).
                 return navigator.mediaDevices.enumerateDevices()
-                    .then(function (devices) {
-                        devices = devices.filter(function (d) {
+                    .then(function(devices) {
+                        devices = devices.filter(function(d) {
                             return d.kind === 'videoinput';
                         });
-                        var back = devices.find(function (d) {
+                        var back = devices.find(function(d) {
                             return d.label.toLowerCase().indexOf('back') !== -1;
                         }) || (devices.length && devices[devices.length - 1]);
                         if (back) {
-                            constraints.video.deviceId = face.exact ? { exact: back.deviceId } :
-                                { ideal: back.deviceId };
+                            constraints.video.deviceId = face.exact ? { exact: back.deviceId } : { ideal: back.deviceId };
                         }
                         constraints.video = constraintsToChrome_(constraints.video);
                         logging('chrome: ' + JSON.stringify(constraints));
@@ -771,6 +814,7 @@ shimConstraints_(cons, res => {
 })
 
 const UINT32_MAX = 4294967295;
+
 function GetBestFitnessDistance(candidateSet, constraints) {
     var first = true;
     for (var i = 0, l = candidateSet.length; i < l; i++) {
@@ -793,7 +837,7 @@ function GetFitnessDistance(aCandidate, aConstraints) {
         // (FitnessDistance(mFacingMode, aConstraints.mFacingMode)) +
         (aCandidate.width ? FitnessDistance(aCandidate.width, aConstraints.width) : 0) +
         (aCandidate.height ? FitnessDistance(aCandidate.height, aConstraints.height) : 0) //+
-    // (aCandidate.maxFPS ? FitnessDistance(double(aCandidate.maxFPS), aConstraints.mFrameRate) : 0);
+        // (aCandidate.maxFPS ? FitnessDistance(double(aCandidate.maxFPS), aConstraints.mFrameRate) : 0);
     return distance;
 }
 
