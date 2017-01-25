@@ -566,6 +566,7 @@ function createStream({
                 //if(frameRate) constraints.video.frameRate = 30;
                 //console.log(JSON.stringify(constraints, null, 4));
                 console.log(JSON.stringify(constraints, null, 4));
+                constraintsPreview.textContent = JSON.stringify(constraints, null, 4);
                 return navigator.mediaDevices[captureMethod](constraints)
                     .then(stream => ({ stream }))
             })
