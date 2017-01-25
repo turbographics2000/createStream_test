@@ -447,7 +447,8 @@ function createStream({
     width = 240,
     height = 180,
     constraints = null,
-    frameRate = undefined
+    frameRate = undefined,
+    captureType = null
 } = {}) {
     // -------------------------------------------------
     // テスト用コード
