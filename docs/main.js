@@ -492,14 +492,11 @@ function createStream({
     } else {
         return Promise.reject('require audio / video member.');
     }
-    proc.then(([audio, video]) => {
-        if ()
-            if (audio.constructor && audio.constructor.name && audio.constructor.name === 'File') {
-                let src = audioContext.decodeAudioData()
-            } else if (audio)
-
-
-    })
+    // proc.then(([audio, video]) => {
+    //         if (audio.constructor && audio.constructor.name && audio.constructor.name === 'File') {
+    //             let src = audioContext.decodeAudioData()
+    //         } else if (audio)
+    // })
     if (captureType) {
         if (typeof captureType !== 'string' &&
             !(Array.isArray(captureType) &&
