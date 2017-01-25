@@ -161,7 +161,7 @@ function createExactSizePatternTestButton() {
     let buttonContainer = createButtonContainer(`カメラサイズ (exact)`);
     for (let j = 100; j < 3500; j += 100) {
         let btn = createTestButton(`${j}x${j}`, function() {
-            preview.srcObject = createStream({
+            createStream({
                 captureType: 'camera',
                 video: {
                     width: j,
@@ -183,7 +183,7 @@ function createScreenCaptureAPITestButton() {
     let buttonContainer = createButtonContainer('Screen Capture API 向けテスト');
     screenCaptureAPIPatterns.forEach(pattern => {
         let btn = createTestButton(pattern, function() {
-            preview.srcObject = createStream({
+            createStream({
                 captureType: this.textContent
             }).then(stream => {
                 errorMessage.textContent = '';
@@ -201,7 +201,7 @@ function createChromeScreenCaptureTestButton() {
     let buttonContainer = createButtonContainer('Chrome向けスクリーンキャプチャテスト');
     chromeScreenCapturePatterns.forEach(pattern => {
         let btn = createTestButton(pattern, function() {
-            preview.srcObject = createStream({
+            createStream({
                 captureType: this.textContent
             }).then(stream => {
                 errorMessage.textContent = '';
@@ -219,7 +219,7 @@ function createFirefoxScreenCaptureTestButton() {
     let buttonContainer = createButtonContainer('Firefox向けスクリーンキャプチャテスト');
     firefoxScreenCapturePatterns.forEach(pattern => {
         let btn = createTestButton(pattern, function() {
-            preview.srcObject = createStream({
+            createStream({
                 captureType: this.textContent
             }).then(stream => {
                 errorMessage.textContent = '';
@@ -237,7 +237,7 @@ function createRealSizePatternTestButton() {
     let buttonContainer = createButtonContainer('実サイズ');
     logicoolSize.forEach(({ width, height }) => {
         let btn = createTestButton(`${width}x${height}`, function() {
-            preview.srcObject = createStream({
+            createStream({
                 captureType: 'camera',
                 video: { width, height }
             }).then(stream => {
@@ -256,7 +256,7 @@ function createCaptureTypeTestButton() {
     let buttonContainer = createButtonContainer('ダミーパターン (画像とWeb Audio APIからストリームを生成)');
     dummyPatterns.forEach(val => {
         let btn = createTestButton([].concat(val).join('-').toString(), function() {
-            preview.srcObject = createStream({
+            createStream({
                 captureType: this.textContent === 'dummy' ? null : this.textContent
             }).then(stream => {
                 errorMessage.textContent = '';
