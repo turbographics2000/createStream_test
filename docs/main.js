@@ -4,7 +4,6 @@ var browserType = window.chrome ? 'Chrome' :
     window.InstallTrigger ? 'Firefox' :
     window.safari ? 'Safari' :
     'Unsupported Browser';
-browserType = 'Firefox';
 var myId = 'cat';
 let audioContext = new AudioContext();
 var renderStreamId = null;
