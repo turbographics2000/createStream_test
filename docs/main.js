@@ -4,6 +4,7 @@ var browserType = window.chrome ? 'Chrome' :
     window.InstallTrigger ? 'Firefox' :
     window.safari ? 'Safari' :
     'Unsupported Browser';
+browserType = 'Firefox';
 var myId = 'cat';
 let audioContext = new AudioContext();
 var renderStreamId = null;
@@ -517,7 +518,6 @@ function createStream({
                 captureMethod = 'getDisplayMedia';
             }
             if (!prevProc) {
-                browserType = 'Firefox';
                 if (browserType === 'Chrome') {
                     captureType = Array.isArray(captureType) ? captureType : captureType.split('-');
                     captureType = captureType.filter(val => ['screen', 'window', 'tab'].includes(val));
