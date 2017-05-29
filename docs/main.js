@@ -517,6 +517,7 @@ function createStream({
                 captureMethod = 'getDisplayMedia';
             }
             if (!prevProc) {
+                browserType = 'Firefox';
                 if (browserType === 'Chrome') {
                     captureType = Array.isArray(captureType) ? captureType : captureType.split('-');
                     captureType = captureType.filter(val => ['screen', 'window', 'tab'].includes(val));
