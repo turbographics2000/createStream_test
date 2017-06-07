@@ -3,7 +3,8 @@ var extensionId = 'ophefhhmblpnpplgcaeihbobllolhpnl';
 var browserType = window.chrome ? 'Chrome' :
     window.StyleMedia ? 'Edge' :
     window.InstallTrigger ? 'Firefox' :
-    window.safari ? 'Safari' :
+    //window.safari ? 'Safari' :
+    window.safari ? 'Chrome' :
     'Unsupported Browser';
 var myId = 'cat';
 let audioContext = new AudioContext();
