@@ -1,3 +1,4 @@
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
 var extensionId = 'ophefhhmblpnpplgcaeihbobllolhpnl';
 var browserType = window.chrome ? 'Chrome' :
     window.StyleMedia ? 'Edge' :
