@@ -852,3 +852,12 @@ function FitnessDistance(aN, aRange) {
     if (aN === aRange) return 0;
     return (Math.abs(aN - aRange) * 1000) / Math.max(Math.abs(aN), Math.abs(aRange));
 }
+
+
+function checkPreviewSize() {
+    requestAnimationFrame(checkPreviewSize);
+    if(preview && preview.videoWidth) {
+        previewSize.textContent = preview.videoWidth + ' x ' + preview.videoHeight;
+    }
+}
+checkPreviewSize();
