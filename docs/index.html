@@ -9,10 +9,9 @@
 </head>
 
 <body>
-    <label><input id="chkForceNewSpecConstraints" type="checkbox">Force New Spec Constraints</label>
     <div id="container">
         <div id="videoContainer">
-            <video id="preview" width="320" height="240" style="background:black" autoplay></video>
+            <video id="preview" width="300" height="200" style="background:black" autoplay></video>
             <div id="errorMessage"></div>
             <div id="previewSize"></div>
             <div style="margin-top:10px">
@@ -20,7 +19,9 @@
                 <pre><code id="constraintsPreview"></code></pre>
             </div>
         </div>
-        <div id="testPatternContainer"></div>
+        <div id="testPatternContainer">
+            <label><input id="chkForceNewSpecConstraints" type="checkbox">Force New Spec Constraints</label>
+        </div>
     </div>
     <script src="main.js"></script>
 </body>
