@@ -12,7 +12,7 @@ body {
 
 #videoContainer {
     display: inline-block;
-    width: 400px;
+    width: 320px;
     vertical-align: top;
     position: fixed;
     left: 10px;
