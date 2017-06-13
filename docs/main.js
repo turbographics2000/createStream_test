@@ -13,6 +13,13 @@ var streams = {};
 streams[myId] = {};
 window.MediaStream = window.MediaStream || window.webkitMediaStream;
 
+chkForceNewSpecConstraints.onchange = evt => {
+    if(chkForceNewSpecConstraints.value) {
+        browserType = 'Firefox';
+    } else {
+        browserType = 'Chrome';
+    }
+}
 var logicoolSize = [
     { width: 160, height: 120 },
     { width: 176, height: 144 },
